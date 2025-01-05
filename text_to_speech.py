@@ -54,7 +54,7 @@ def text_to_speech(input_response = "What is the weather report"):
     payload = {
         "voice_id": "emily",
         "text": input_response,
-        "sample_rate": 24000,
+        "sample_rate": 8000,
         "add_wav_header": True
     }
     headers = {
