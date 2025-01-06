@@ -7,7 +7,6 @@ from models import get_llm
 
 def conversation_stage_chain(llm : ChatGroq):
     """To get the Conversation Stage"""
-    
     prompt = PromptTemplate(
         template= STAGE_ANALYZER_INCEPTION_PROMPT,
         input_variables= [

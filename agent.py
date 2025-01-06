@@ -10,7 +10,7 @@ chain = conversation_chain(get_llm())
 
 # agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-def sales_conversation(user_input, conversation_history=""):
+def sales_conversation(conversation_history=""):
     try:
         # Prepare input for the agent
         response = chain.invoke({
@@ -39,10 +39,10 @@ if __name__ == "__main__":
         if "<END_OF_CALL>" in user_input:
             print("Sales Agent: Thank you for your time. Have a great day!")
             break
-        response = sales_conversation(user_input, conversation_history)
-        # text_to_speech.text_to_speech(response)
+        conversation_history += f"User : {user_input}\n"
+        response = sales_conversation(conversation_history)
         print(f"Sales Agent: {response}")
-        conversation_history += f"User: {user_input}\nSales Agent: {response}\n"
+        conversation_history += f"Sales Agent: {response}\n"
 
 
 
