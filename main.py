@@ -4,14 +4,14 @@ import text_to_speech
 import time
 while True:
     try:
-        start = time.time()
-        # question = speech_to_text.speech_to_text()
-        print("Question : ")
-        question = input()
-        response = aiagent.ai_agent(question)
+        question = speech_to_text.speech_to_text()
+        # print("Question : ")
+        # question = input()
+        response = aiagent.Ai_Agent(question)
+
         text_to_speech.text_to_speech(response)
-        end = time.time()
-        print(end - start)
+        end1 = time.time()
+        print(end1 - end)
 
     except KeyboardInterrupt:
         print("Stopping...")
