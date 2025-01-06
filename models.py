@@ -15,29 +15,3 @@ def get_llm():
 
     return llm
 
-
-
-
-# # Create a simple prompt
-# prompt = ChatPromptTemplate.from_messages([
-#     ("system", SALES_PROMPT),
-#     ("user", "{input}")
-# ])
-
-# Create the chain that guarantees JSON output
-# chain = prompt | llm
-
-# def parse_product(description: str) -> dict:
-#     result = chain.invoke({"input": description})
-#     print(result.content)
-#     return result.content
-
-        
-# Example usage
-# while True:
-#     description = input("User : ")
-#     content = parse_product(description)
-#     end = time.time()
-#     print(end - start)
-
-#     text_to_speech.text_to_speech(content)

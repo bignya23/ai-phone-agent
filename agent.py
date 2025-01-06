@@ -1,41 +1,48 @@
-from langchain_groq import ChatGroq
+from langchain.prompts import ChatPromptTemplate
+from models import get_llm
+from langchain.agents import initialize_agent
+from langchain.tools import Tool
 from langchain.prompts import PromptTemplate
-from prompts import SALES_AGENT_TOOLS_PROMPT
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
-from dotenv import load_dotenv
+from chains import conversation_chain
+import text_to_speech
 
-load_dotenv()
+chain = conversation_chain(get_llm())
+
+# agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+def sales_conversation(user_input, conversation_history=""):
+    try:
+        # Prepare input for the agent
+        response = chain.invoke({
+            "salesperson_name" : "Alex",
+            "salesperson_role" : "Business Development Representative",
+            "company_name" : "Sleep Haven",
+            "company_business": """Sleep Haven is a premium mattress company that provides customers with the most comfortable and supportive sleeping experience possible. We offer a range of high-quality mattresses, pillows, and bedding accessories that are designed to meet the unique needs of our customers.""",
+            "company_values" : """Our mission at Sleep Haven is to help people achieve a better night's sleep by providing them with the best possible sleep solutions. We believe that quality sleep is essential to overall health and well-being, and we are committed to helping our customers achieve optimal sleep by offering exceptional products and customer service.""",
+            "conversation_purpose": "find out whether they are looking to achieve better sleep via buying a premier mattress.",
+            "conversation_type" : "call",
+            "conversation_history": conversation_history
+        })
+        
+        # Run the agent
+        return response
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 
-
-
-sales_agent_prompt = PromptTemplate(
-   
-    template="""
-You are a sales agent named alex from techno.
-
-
-Always be polite, keep responses concise, and adapt to the stage. 
-Respond in one sentence and output "<END_OF_CALL>" when the call ends.
-
-
-"""
-)
-
-
-
-llm = ChatGroq(
-    model="mixtral-8x7b-32768",
-    temperature=0.0,
-    max_retries=2,
+if __name__ == "__main__":
+    conversation_history = ""
+    print("Sales Agent: Hello! This is Alex from TechCorp. How can I assist you today?")
     
-)
+    while True:
+        user_input = input("You: ")
+        if "<END_OF_CALL>" in user_input:
+            print("Sales Agent: Thank you for your time. Have a great day!")
+            break
+        response = sales_conversation(user_input, conversation_history)
+        # text_to_speech.text_to_speech(response)
+        print(f"Sales Agent: {response}")
+        conversation_history += f"User: {user_input}\nSales Agent: {response}\n"
 
 
-chain = sales_agent_prompt | llm
 
-
-response = chain.invoke("hello")
-
-print(response)
