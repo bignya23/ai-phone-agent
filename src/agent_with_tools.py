@@ -3,9 +3,11 @@ from langchain.prompts import PromptTemplate
 from langchain.tools import BaseTool
 from typing import List, Any
 from langchain_core.messages import SystemMessage, HumanMessage
-from models import get_llm
-from prompts import SALES_AGENT_INCEPTION_PROMPT_WITH_TOOLS
-from variables import *
+from src.models import get_llm
+from src.text_to_speech import text_to_speech
+from src.prompts import SALES_AGENT_TOOLS_PROMPT
+from src.variables import *
+
 class CRMTool(BaseTool):
     name: str = "search_customer"
     description: str = "Search for customer information in the CRM system"
@@ -22,6 +24,7 @@ class ProductCatalogTool(BaseTool):
         # Simulate product catalog lookup
         return f"Product found: {query} - $99/month, Enterprise features included"
 
+
 def create_sales_agent():
     # Initialize the model
     llm = get_llm()
@@ -32,44 +35,7 @@ def create_sales_agent():
         ProductCatalogTool()
     ]
     
-    # Create the agent prompt template
-    prompt_template = """You are an experienced sales agent. Your goal is to help customers find the right products and provide accurate information.
-
-    You have access to the following tools:
-    {tools}
-
-
-
-    Follow these steps for each interaction:
-    1. Understand the customer's needs
-    2. Use appropriate tools to gather information
-    3. Provide personalized recommendations
-    4. Answer any questions clearly
-
-    Remember to:
-    - Be professional and courteous
-    - Focus on value proposition
-    - Handle objections effectively
-    - Document all interactions
-
-    Use the following format:
-    Question: the input question you must answer
-    Thought: you should always think about what to do
-    Action: the action to take, should be one of {tool_names}
-    Action Input: the input to the action
-    Observation: the result of the action
-    ... (this Thought/Action/Action Input/Observation can repeat N times)
-    Thought: I now know the final answer
-    Final Answer: the final answer to the original input question
-    
-    Previous conversation:
-    {chat_history}
-    
-    Question: {input}
-    
-    {agent_scratchpad}"""
-    
-    prompt = PromptTemplate.from_template(SALES_AGENT_INCEPTION_PROMPT_WITH_TOOLS)
+    prompt = PromptTemplate.from_template(SALES_AGENT_TOOLS_PROMPT)
     
     # Create the agent
     agent = create_react_agent(
@@ -114,13 +80,14 @@ class SalesAgentManager:
         ])
         
         return response["output"]
+    
 
-# Example usage
 if __name__ == "__main__":
     sales_manager = SalesAgentManager()
     user_query = ""
-    # Example conversation
+
     while True:
-        response = sales_manager.process_message(user_query),
+        response = sales_manager.process_message(user_query)
         print(response)
+        text_to_speech(response)
         user_query = input("User: ")

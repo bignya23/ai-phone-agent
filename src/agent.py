@@ -1,13 +1,12 @@
 from langchain.prompts import ChatPromptTemplate
-from models import get_llm
+from src.models import get_llm
 from langchain.agents import initialize_agent
 from langchain.tools import Tool
 from langchain.prompts import PromptTemplate
-from chains import conversation_chain
-import text_to_speech
-from variables import *
-from tools import *
-from langchain.agents import tool, create_tool_calling_agent
+from src.chains import conversation_chain
+import src.text_to_speech as text_to_speech
+from src.variables import *
+from src.tools import *
 
 chain = conversation_chain(get_llm())
 

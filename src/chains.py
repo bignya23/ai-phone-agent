@@ -1,9 +1,9 @@
 from langchain_core.prompts import PromptTemplate
-from prompts import SALES_AGENT_INCEPTION_PROMPT, STAGE_ANALYZER_INCEPTION_PROMPT
+from src.prompts import SALES_AGENT_INCEPTION_PROMPT, STAGE_ANALYZER_INCEPTION_PROMPT
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
-from models import get_llm
-from tools import combine_tools
+from src.models import get_llm
+from src.tools import combine_tools
 
 def conversation_stage_chain(llm : ChatGroq):
     """To get the Conversation Stage"""
@@ -23,8 +23,6 @@ def conversation_stage_chain(llm : ChatGroq):
 def conversation_tool_chain(llm : ChatGroq):
 
     """Get the response parser."""
-
-  
 
     prompt = PromptTemplate(
         template= SALES_AGENT_INCEPTION_PROMPT,
