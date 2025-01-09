@@ -1,0 +1,69 @@
+1. Product Name: Memory Foam Mattress
+   Category: Mattress
+   Description: A mattress designed with high-density memory foam that contours to your body, providing optimal support and comfort. Perfect for people who experience back pain or prefer a softer, more plush feel.
+   Features:
+     - Pressure-relieving memory foam
+     - Breathable fabric
+     - Ideal for side and back sleepers
+     - Motion isolation for undisturbed sleep
+   Benefits:
+     - Helps alleviate back pain
+     - Regulates body temperature for a cooler sleep
+     - Promotes deep, restful sleep
+   Price: $899.99
+
+2. Product Name: Hybrid Mattress
+   Category: Mattress
+   Description: A combination of memory foam and innerspring coils to provide both comfort and support. The hybrid mattress delivers a balanced feel, with the support of coils and the plush comfort of foam.
+   Features:
+     - Combines foam and coils for support and comfort
+     - Breathable fabric cover
+     - Perfect for stomach and back sleepers
+     - Durable and long-lasting
+   Benefits:
+     - Provides excellent support for spine alignment
+     - Reduces pressure points for a better night's sleep
+     - Durable and long-lasting construction
+   Price: $1099.99
+
+3. Product Name: Cooling Gel Pillow
+   Category: Pillow
+   Description: A pillow filled with cooling gel to regulate temperature and keep you cool throughout the night. Perfect for hot sleepers who need extra comfort and support for their head and neck.
+   Features:
+     - Cooling gel technology
+     - Ergonomic design
+     - Supports proper head and neck alignment
+     - Hypoallergenic and breathable cover
+   Benefits:
+     - Prevents overheating during sleep
+     - Alleviates neck and shoulder pain
+     - Ideal for hot sleepers
+   Price: $99.99
+
+4. Product Name: Plush Down Pillow
+   Category: Pillow
+   Description: A luxurious pillow filled with soft, high-quality down for a plush and comfortable sleep experience. Great for side and back sleepers who need extra softness and support.
+   Features:
+     - Soft down filling
+     - Adjustable loft for personalized comfort
+     - Breathable cotton cover
+     - Hypoallergenic
+   Benefits:
+     - Soft and comfortable for a restful sleep
+     - Provides excellent support for side and back sleepers
+     - Keeps you cool and dry all night
+   Price: $149.99
+
+5. Product Name: Luxury Bed Sheet Set
+   Category: Bedding Accessories
+   Description: A premium set of bed sheets made from high-quality cotton with a silky smooth feel. Available in a variety of sizes and colors to fit your bed perfectly.
+   Features:
+     - High-quality cotton fabric
+     - Soft and breathable
+     - Available in various colors and sizes
+     - Durable and long-lasting
+   Benefits:
+     - Provides a comfortable and luxurious sleep experience
+     - Helps regulate body temperature for a better night's rest
+     - Long-lasting and easy to care for
+   Price: $159.99
