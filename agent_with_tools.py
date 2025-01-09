@@ -4,6 +4,8 @@ from langchain.tools import BaseTool
 from typing import List, Any
 from langchain_core.messages import SystemMessage, HumanMessage
 from models import get_llm
+from prompts import SALES_AGENT_INCEPTION_PROMPT_WITH_TOOLS
+from variables import *
 class CRMTool(BaseTool):
     name: str = "search_customer"
     description: str = "Search for customer information in the CRM system"
@@ -36,7 +38,7 @@ def create_sales_agent():
     You have access to the following tools:
     {tools}
 
-    Available tools: {tool_names}
+
 
     Follow these steps for each interaction:
     1. Understand the customer's needs
@@ -67,7 +69,7 @@ def create_sales_agent():
     
     {agent_scratchpad}"""
     
-    prompt = PromptTemplate.from_template(prompt_template)
+    prompt = PromptTemplate.from_template(SALES_AGENT_INCEPTION_PROMPT_WITH_TOOLS)
     
     # Create the agent
     agent = create_react_agent(
@@ -80,7 +82,7 @@ def create_sales_agent():
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
-        verbose=True,
+        verbose=False,
         handle_parsing_errors=True
     )
     
@@ -94,6 +96,13 @@ class SalesAgentManager:
     def process_message(self, message: str) -> str:
         """Process a customer message and return the agent's response"""
         response = self.agent.invoke({
+            "salesperson_name" : salesperson_name,
+            "salesperson_role" : salesperson_role,
+            "company_name" : company_name,
+            "company_business": company_business,
+            "company_values" :company_values,
+            "conversation_purpose": conversation_purpose,
+            "conversation_type" : conversation_type,
             "input": message,
             "chat_history": self.chat_history
         })
@@ -109,14 +118,9 @@ class SalesAgentManager:
 # Example usage
 if __name__ == "__main__":
     sales_manager = SalesAgentManager()
-    
+    user_query = ""
     # Example conversation
-    responses = [
-        sales_manager.process_message("I'm interested in your enterprise solution"),
-        sales_manager.process_message("What's the pricing for 100 users?"),
-        sales_manager.process_message("Can you check my current subscription status?")
-    ]
-    
-    for i, response in enumerate(responses, 1):
-        print(f"\nInteraction {i}:")
+    while True:
+        response = sales_manager.process_message(user_query),
         print(response)
+        user_query = input("User: ")
