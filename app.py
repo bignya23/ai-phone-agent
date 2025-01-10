@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse, Gather
-from src.agent import sales_conversation
+from agent import sales_conversation
 from src.text_to_speech import text_to_speech
 import requests
 import os
@@ -60,8 +60,8 @@ def handle_call():
     """Handle initial call and subsequent interactions."""
     try:
         response = VoiceResponse()
-        welcome_message = "Please state your query after the beep."
-        response.say(welcome_message, voice="alice")
+        # welcome_message = "Please state your query after the beep."
+        # response.say(welcome_message, voice="alice")
         
         gather = Gather(
             input="speech",
@@ -111,7 +111,7 @@ def process_query():
             
             response = VoiceResponse()
             response.play(audio_url)
-            response.pause(length=1)
+            # response.pause(length=1)
             response.redirect("/handle_call")
             
             return str(response)

@@ -73,8 +73,8 @@ if __name__ == "__main__":
     
     while True:
         conversation_history += f"User : {user_input}\n"
-        current_stage = conversation_tool(conversation_history)
-        print(f"Tool : {current_stage}\n")
+        # current_stage = conversation_tool(conversation_history)
+        # print(f"Tool : {current_stage}\n")
         response = sales_conversation(conversation_history)
         print(f"Sales Agent: {response}")
         user_input = input("You: ")
