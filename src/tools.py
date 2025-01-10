@@ -9,9 +9,9 @@ import os
 from langchain.schema import Document
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.agents import tool, create_tool_calling_agent
+from src.variables import company_name
 
-@tool
-def get_knowledge_base(query: str):
+def knowledge_base(query: str):
     """Retrieve information related to a query."""
 
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
@@ -24,18 +24,43 @@ def get_knowledge_base(query: str):
 
 def generate_calendly_invitation_link(query):
     '''Generate a calendly invitation link based on the single query string'''
-    pass
-
-
-def combine_tools():
+    event_type_uuid = os.getenv("CALENDLY_EVENT_UUID")
+    api_key = os.getenv('CALENDLY_API_KEY')
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+    url = 'https://api.calendly.com/scheduling_links'
+    payload = {
+    "max_event_count": 1,
+    "owner": f"https://api.calendly.com/event_types/{event_type_uuid}",
+    "owner_type": "EventType"
+    }
     
-    tools = [get_knowledge_base]
+    
+    response = requests.post(url, json=payload, headers=headers)
+    if response.status_code == 201:
+        data = response.json()
+        return f"url: {data['resource']['booking_url']}"
+    else:
+        return "Failed to create Calendly link: "
+
+def payment_upi():
+    return f"Payment Upi id : {company_name}@okaxis" 
+
+def payment_link(amount):
+
+    return "Payment Link : https://razorpay.com/{100....}"
 
 
-    return tools
+def execute_tools(response):
 
-
+    if response == "No":
+        return 
+    else:
+        pass
+        
+    
 
 if __name__ == "__main__":
     print(combine_tools())
-    print(get_knowledge_base("matresses options"))

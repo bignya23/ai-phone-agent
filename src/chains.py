@@ -1,9 +1,8 @@
 from langchain_core.prompts import PromptTemplate
-from src.prompts import SALES_AGENT_INCEPTION_PROMPT, STAGE_ANALYZER_INCEPTION_PROMPT
+from src.prompts import SALES_AGENT_INCEPTION_PROMPT, STAGE_ANALYZER_INCEPTION_PROMPT, STAGE_ANALYZER_TOOLS_PROMPT
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
-from src.models import get_llm
-from src.tools import combine_tools
+from src.models import get_llm, gemini_llm
 
 def conversation_stage_chain(llm : ChatGroq):
     """To get the Conversation Stage"""
@@ -25,24 +24,19 @@ def conversation_tool_chain(llm : ChatGroq):
     """Get the response parser."""
 
     prompt = PromptTemplate(
-        template= SALES_AGENT_INCEPTION_PROMPT,
+        template= STAGE_ANALYZER_TOOLS_PROMPT,
         input_variables=[
-            "salesperson_name",
-            "salesperson_role",
-            "company_name",
-            "company_business",
-            "company_values",
-            "conversation_purpose",
-            "conversation_type",
-            "conversation_history",
+            "conversation_history"
             ],
     )
 
-    return prompt
-    # response = chain.invoke(input={"adjective" : "funny"})
-    # return response
+    chain = prompt | llm | StrOutputParser()
+ 
 
-def conversation_chain(llm : ChatGroq):
+    return chain
+  
+
+def conversation_chain(llm):
 
     """Get the response parser."""
 
@@ -50,8 +44,6 @@ def conversation_chain(llm : ChatGroq):
     #     template="Tell me a {adjective} joke",
     #     input_variables=["adjective"]
     # )
-
-    tools = combine_tools()
 
     prompt = PromptTemplate(
         template= SALES_AGENT_INCEPTION_PROMPT,
@@ -67,7 +59,7 @@ def conversation_chain(llm : ChatGroq):
             ],
     )
 
-    chain = prompt | llm.bind_tools(tools) | StrOutputParser()
+    chain = prompt | llm | StrOutputParser()
 
     return chain
     # response = chain.invoke(input={"adjective" : "funny"})

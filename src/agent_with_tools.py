@@ -1,12 +1,11 @@
 from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 from langchain.tools import BaseTool
-from typing import List, Any
 from langchain_core.messages import SystemMessage, HumanMessage
-from src.models import get_llm
-from src.text_to_speech import text_to_speech
-from src.prompts import SALES_AGENT_TOOLS_PROMPT
-from src.variables import *
+from models import get_llm, gemini_llm
+from text_to_speech import text_to_speech
+from prompts import SALES_AGENT_TOOLS_PROMPT, SALES_AGENT_INCEPTION_PROMPT_WITH_TOOLS
+from variables import *
 
 class CRMTool(BaseTool):
     name: str = "search_customer"
@@ -27,7 +26,7 @@ class ProductCatalogTool(BaseTool):
 
 def create_sales_agent():
     # Initialize the model
-    llm = get_llm()
+    llm = gemini_llm()
     
     # Define tools
     tools = [
@@ -48,7 +47,7 @@ def create_sales_agent():
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
-        verbose=False,
+        verbose=True,
         handle_parsing_errors=True
     )
     
@@ -87,7 +86,7 @@ if __name__ == "__main__":
     user_query = ""
 
     while True:
+        user_query = input("User: ")
         response = sales_manager.process_message(user_query)
         print(response)
         text_to_speech(response)
-        user_query = input("User: ")

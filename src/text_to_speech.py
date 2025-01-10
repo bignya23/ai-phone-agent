@@ -1,76 +1,68 @@
 import time
 import os
 import requests
-import pyaudio
-import wave
-from io import BytesIO
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
-def play_audio_from_response(response):
-    """
-    Play WAV audio directly from the API response.
-    """
-    if response.status_code == 200:
-        # Load audio content into a BytesIO stream
-        audio_stream = BytesIO(response.content)
-
-        # Read the WAV file from the stream
-        with wave.open(audio_stream, 'rb') as wf:
-            p = pyaudio.PyAudio()
-
-            # Open a PyAudio stream
-            stream = p.open(
-                format=p.get_format_from_width(wf.getsampwidth()),
-                channels=wf.getnchannels(),
-                rate=wf.getframerate(),
-                output=True
-            )
-
-            # Play the audio in chunks
-            chunk = 1024
-            data = wf.readframes(chunk)
-            while data:
-                stream.write(data)
-                data = wf.readframes(chunk)
-
-            # Close the stream
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
-            print("Audio played successfully.")
-    else:
-        print(f"Failed to generate TTS audio. Status code: {response.status_code}, Response: {response.text}")
-
 def text_to_speech(input_response="What is the weather report in india"):
     """
-    Generate TTS audio and play it directly.
+    Generate TTS audio, save it locally, and return the file path.
+    Returns:
+        str: Path to the saved audio file or None if there's an error
     """
-    token = os.getenv("WAVES_API_KEY")
-    start_in = time.time()
-    url = "https://waves-api.smallest.ai/api/v1/lightning/get_speech"
+    try:
+        token = os.getenv("WAVES_API_KEY")
+        if not token:
+            raise ValueError("WAVES_API_KEY not found in environment variables")
 
-    payload = {
-        "voice_id": "arman",
-        "text": input_response,
-        "sample_rate": 8000,
-        "add_wav_header": True
-    }
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
+        url = "https://waves-api.smallest.ai/api/v1/lightning/get_speech"
 
-    response = requests.request("POST", url, json=payload, headers=headers)
-    end_in = time.time()
-    print(end_in - start_in)
-    # Play audio directly from the response
-    play_audio_from_response(response)
+        payload = {
+            "voice_id": "arman",
+            "text": input_response,
+            "sample_rate": 8000,
+            "add_wav_header": True
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
 
+        # Make request to Waves API
+        start_time = time.time()
+        response = requests.request("POST", url, json=payload, headers=headers)
+        
+        if response.status_code != 200:
+            print(f"Waves API error: {response.status_code}, {response.text}")
+            return None
+
+        # Create audio directory if it doesn't exist
+        audio_dir = "static/audio"
+        os.makedirs(audio_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = f"audio_{uuid.uuid4()}.wav"
+        file_path = os.path.join(audio_dir, filename)
+
+        # Save the audio file
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+
+        print(f"Audio processing time: {time.time() - start_time:.2f} seconds")
+        print(f"Audio saved to: {file_path}")
+        
+        # Return the URL-friendly path
+        return f"/static/audio/{filename}"
+
+    except Exception as e:
+        print(f"Error in text_to_speech: {str(e)}")
+        return None
 
 if __name__ == "__main__":
     start = time.time()
-    text_to_speech()
-    end = time.time()
-    print(end - start)
+    path = text_to_speech()
+    print(f"Total execution time: {time.time() - start:.2f} seconds")
+    print(f"Audio path: {path}")

@@ -4,3 +4,5 @@ audio
 .idea
 __pycache__
 output.wav
+ngrok.exe
+static
