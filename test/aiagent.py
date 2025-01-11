@@ -1,6 +1,6 @@
 from phi.agent import Agent
 from phi.model.groq import Groq
-from src.speech_to_text import speech_to_text
+from speech_to_text import speech_to_text
 from dotenv import load_dotenv
 import time
 
