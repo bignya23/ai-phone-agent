@@ -10,7 +10,7 @@ app = Flask(__name__)
 conversation_history = ""
 user_input = ""
 
-@app.route("/get_info" , methods =["GET"])
+@app.route("/get_info" , methods =["POST"])
 def get_info():
     data = request.get_json()
 
@@ -22,17 +22,36 @@ def get_info():
     conversation_purpose = data.get("conversation_purpose")
     conversation_type = data.get("conversation_type")
 
-    return salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type
+    return jsonify({
+        "salesperson_name": salesperson_name,
+        "salesperson_role": salesperson_role,
+        "company_name": company_name,
+        "company_business": company_business,
+        "company_values": company_values,
+        "conversation_purpose": conversation_purpose,
+        "conversation_type": conversation_type
+    })
 
 @app.route("/agent", methods=["POST"])
 def main_agent():
     global conversation_history
     global user_input
-    salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type = get_info()
 
-    conversation_history += f"User : {user_input}\n"
+    response = get_info()
+    
+    data = response.get_json()
+
+    salesperson_name = data["salesperson_name"]
+    salesperson_role = data["salesperson_role"]
+    company_name = data["company_name"]
+    company_business = data["company_business"]
+    company_values = data["company_values"]
+    conversation_purpose = data["conversation_purpose"]
+    conversation_type = data["conversation_type"]
+
 
     while True:  
+        conversation_history += f"User : {user_input}\n"
         start = time.time()
         response = agent.sales_conversation(salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type,conversation_history)
 
@@ -51,7 +70,7 @@ def main_agent():
         print("Playing audio....")
 
         file_path = src.text_to_speech.text_to_speech(clean_message)
-        playsound(file_path)
+        playsound.playsound(file_path)
 
         if response.endswith("<END_OF_CALL>"):
             pass
