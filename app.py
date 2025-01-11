@@ -20,7 +20,7 @@ app = Flask(__name__)
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
-BASE_URL = os.getenv('BASE_URL', 'https://4fe2-14-139-217-140.ngrok-free.app')
+BASE_URL = os.getenv('BASE_URL', 'https://764e-14-139-217-140.ngrok-free.app')
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
