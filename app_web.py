@@ -55,16 +55,18 @@ def main_agent():
         start = time.time()
         response = agent.sales_conversation(salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type,conversation_history)
 
+        clean_message = response
+
         if response.endswith("<END_OF_TURN>"):
             clean_message = response.split("<END_OF_TURN>")[0].strip()
             
         if response.endswith("<END_OF_CALL>"):
             clean_message = response.split("<END_OF_CALL>")[0].strip()
             break
-        else:
-            clean_message = response.strip()
+        
             
         end = time.time()
+        print(clean_message)
             
         print(f"Time Taken : {end - start}")
         print("Playing audio....")
@@ -77,10 +79,11 @@ def main_agent():
             # user_input = input("You: ")
         filename = speech_to_text.audio_file()
         user_input = speech_to_text.speech_to_text(filename)
+        print(user_input)
         conversation_history += f"Sales Agent: {clean_message}\n"
 
     return jsonify({
-       "The call has ended..."
+       "message" : "The call has ended..."
     })
 
 
