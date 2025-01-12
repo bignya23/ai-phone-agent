@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { Mic } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
@@ -15,7 +15,6 @@ const HomePage = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -72,64 +71,194 @@ const HomePage = () => {
     }
   };
 
-  const handleMicClick = async () => {
-    if (!isRecording) {
-      setIsRecording(true);
-      toast("Recording started...");
-  
-      try {
-        // Request microphone access
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  
-        // Initialize the MediaRecorder
-        const mediaRecorder = new MediaRecorder(stream);
-        const audioChunks = [];
-  
-        mediaRecorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
-  
-        mediaRecorder.onstop = async () => {
-          // Combine audio chunks into a Blob
-          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-  
-          // Create FormData to send the Blob to the backend
-          const formData = new FormData();
-          formData.append("audio", audioBlob, "recording.wav");
-  
-          try {
-            // Send the audio file to the backend
-            const response = await axios.post("http://127.0.0.1:5000/agent", formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            });
-  
-            console.log("Audio uploaded successfully:", response.data);
-            toast.success("Audio uploaded successfully!");
-          } catch (error) {
-            console.error("Error uploading audio:", error);
-            toast.error("Failed to upload the audio. Please try again.");
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [audioContext, setAudioContext] = useState(null);
+  const mediaRecorder = useRef(null);
+  const audioChunks = useRef([]);
+  const silenceTimeout = useRef(null);
+  const audioQueue = useRef([]);
+  const isPlayingAudio = useRef(false);
+
+  // Silence detection parameters
+  const SILENCE_THRESHOLD = -50; // dB
+  const SILENCE_DURATION = 2000; // 2 seconds of silence to stop recording
+
+  const initAudioContext = async () => {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    setAudioContext(context);
+    return context;
+  };
+
+  const detectSilence = (analyser, dataArray) => {
+    analyser.getFloatTimeDomainData(dataArray);
+    let maxVolume = -Infinity;
+    
+    for (let i = 0; i < dataArray.length; i++) {
+      maxVolume = Math.max(maxVolume, Math.abs(dataArray[i]));
+    }
+    
+    const db = 20 * Math.log10(maxVolume);
+    
+    if (db < SILENCE_THRESHOLD) {
+      if (!silenceTimeout.current) {
+        silenceTimeout.current = setTimeout(() => {
+          if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
+            stopRecording();
           }
-        };
-  
-        // Start recording
-        mediaRecorder.start();
-  
-        // Stop recording after 5 seconds
-        setTimeout(() => {
-          mediaRecorder.stop();
-          stream.getTracks().forEach((track) => track.stop()); // Stop the microphone
-          setIsRecording(false);
-          toast("Recording stopped.");
-        }, 5000); // Adjust the duration as needed
-      } catch (error) {
-        console.error("Error accessing microphone:", error);
-        toast.error("Microphone access denied or not available.");
-        setIsRecording(false);
+        }, SILENCE_DURATION);
       }
     } else {
-      toast("Recording already in progress.");
+      if (silenceTimeout.current) {
+        clearTimeout(silenceTimeout.current);
+        silenceTimeout.current = null;
+      }
     }
   };
+
+  const playNextInQueue = async () => {
+    if (audioQueue.current.length === 0 || isPlayingAudio.current) {
+      return;
+    }
+
+    isPlayingAudio.current = true;
+    const audioUrl = audioQueue.current.shift();
+
+    try {
+      const audio = new Audio(`http://127.0.0.1:5000${audioUrl}`);
+      
+      audio.onended = () => {
+        isPlayingAudio.current = false;
+        if (audioQueue.current.length > 0) {
+          playNextInQueue();
+        } else {
+          startRecording(); // Start recording again after playing all responses
+        }
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      isPlayingAudio.current = false;
+      startRecording(); // Start recording even if audio playback fails
+    }
+  };
+
+  const startRecording = async () => {
+    if (isRecording || isProcessing) return;
+
+    try {
+      const context = audioContext || await initAudioContext();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Set up audio analysis
+      const source = context.createMediaStreamSource(stream);
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      
+      const dataArray = new Float32Array(analyser.fftSize);
+      
+      // Create and configure MediaRecorder
+      mediaRecorder.current = new MediaRecorder(stream);
+      audioChunks.current = [];
+
+      mediaRecorder.current.ondataavailable = (event) => {
+        audioChunks.current.push(event.data);
+      };
+
+      mediaRecorder.current.onstop = async () => {
+        setIsProcessing(true);
+        const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
+        await handleAudioUpload(audioBlob);
+        setIsProcessing(false);
+      };
+
+      // Start recording and silence detection
+      mediaRecorder.current.start();
+      setIsRecording(true);
+      toast.success("Recording started");
+
+      // Continuous silence detection
+      const checkSilence = () => {
+        if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
+          detectSilence(analyser, dataArray);
+          requestAnimationFrame(checkSilence);
+        }
+      };
+      checkSilence();
+
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      toast.error("Failed to start recording");
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    if (!mediaRecorder.current || mediaRecorder.current.state !== "recording") return;
+
+    mediaRecorder.current.stop();
+    mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
+    setIsRecording(false);
+    
+    if (silenceTimeout.current) {
+      clearTimeout(silenceTimeout.current);
+      silenceTimeout.current = null;
+    }
+    
+    toast.success("Recording stopped");
+  };
+
+  const handleAudioUpload = async (audioBlob) => {
+    const formData = new FormData();
+    formData.append("audio", audioBlob);
+
+    try {
+      // Upload audio and get transcription
+      await axios.post("http://127.0.0.1:5000/upload-audio", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Get agent response
+      const response = await axios.post("http://127.0.0.1:5000/agent");
+      
+      if (response.data.audioUrl) {
+        audioQueue.current.push(response.data.audioUrl);
+        playNextInQueue();
+      }
+
+      if (response.data.isEndOfCall) {
+        toast.success("Conversation ended");
+        setIsSubmitted(false); // Reset form
+      }
+    } catch (error) {
+      console.error("Error in conversation:", error);
+      toast.error("Error processing audio");
+      startRecording(); // Restart recording even if there's an error
+    }
+  };
+
+  const handleMicClick = () => {
+    if (!isRecording && !isProcessing) {
+      startRecording();
+    } else if (isRecording) {
+      stopRecording();
+    }
+  };
+
+  // Clean up on component unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorder.current) {
+        stopRecording();
+      }
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, []);
+
   
 
   return (
@@ -309,15 +438,21 @@ const HomePage = () => {
         />
       ) : (
         <div className="flex flex-col justify-center items-center">
-          <button onClick={handleMicClick} className="focus:outline-none">
+          <button 
+            onClick={handleMicClick} 
+            className="focus:outline-none"
+            disabled={isProcessing}
+          >
             <Mic
               className={`w-16 h-16 ${
-                isRecording ? "text-red-500" : "text-primary"
+                isRecording ? "text-red-500" : 
+                isProcessing ? "text-gray-400" : "text-primary"
               }`}
             />
           </button>
           <p className="text-xl font-semibold mt-4">
-            {isRecording ? "Recording..." : "Tap to Speak"}
+            {isRecording ? "Recording..." : 
+             isProcessing ? "Processing..." : "Tap to Speak"}
           </p>
         </div>
       )}

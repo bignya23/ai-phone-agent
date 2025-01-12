@@ -37,6 +37,7 @@ def main_agent():
     global user_input
     global inputs
 
+    
     # Generate response from agent
     response = agent.sales_conversation(
         inputs["salesperson_name"],
@@ -69,9 +70,6 @@ def main_agent():
         "isEndOfCall": isendofcall
     })
 
-@app.route("/audio/<filename>")
-def serve_audio(filename):
-    return send_file(f"/frontend/src/audio/{filename}")
 
 @app.route("/upload-audio", methods=["POST"])
 def upload_audio():
@@ -89,12 +87,42 @@ def upload_audio():
     
     # Convert speech to text
     user_input = speech_to_text.speech_to_text(temp_filename)
+
     conversation_history += f"User: {user_input}\n"
     
-    # Clean up temp file
-    # os.remove(temp_filename)
+    response = agent.sales_conversation(
+        inputs["salesperson_name"],
+        inputs["salesperson_role"],
+        inputs["company_name"],
+        inputs["company_business"],
+        inputs["company_values"],
+        inputs["conversation_purpose"],
+        inputs["conversation_type"],
+        conversation_history
+    )
+
+    clean_message = response
+    isendofcall = False
+    if response.endswith("<END_OF_TURN>"):
+        clean_message = response.split("<END_OF_TURN>")[0].strip()
     
-    return jsonify({"transcription": user_input})
+    if response.endswith("<END_OF_CALL>"):
+        clean_message = response.split("<END_OF_CALL>")[0].strip()
+        isendofcall = True
+
+    # Generate audio file
+    audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+    
+    conversation_history += f"Sales Agent: {clean_message}\n"
+
+    return jsonify({
+        "message": clean_message,
+        "audioUrl": f"/audio/{os.path.basename(audio_file_path)}",
+        "isEndOfCall": isendofcall
+    })
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+ 
