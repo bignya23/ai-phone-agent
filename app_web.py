@@ -20,12 +20,13 @@ inputs = {}
 def get_info():
     data = request.get_json()
     global inputs
-    salesperson_name = data.get("salesperson_name")
-    salesperson_role = data.get("salesperson_role")
-    company_name = data.get("company_name")
-    company_business = data.get("company_business")
-    company_values = data.get("company_values")
-    conversation_purpose = data.get("conversation_purpose")
+
+    salesperson_name = data.get("salespersonName")
+    salesperson_role = data.get("salespersonRole")
+    company_name = data.get("companyName")
+    company_business = data.get("companyBusiness")
+    company_values = data.get("companyValues")
+    conversation_purpose = data.get("conversationPurpose")
     conversation_type = data.get("conversation_type")
 
 
@@ -53,6 +54,7 @@ def get_info():
 def main_agent():
     global conversation_history
     global user_input
+    global inputs
 
     salesperson_name = inputs["salesperson_name"]
     salesperson_role = inputs["salesperson_role"]
@@ -85,7 +87,7 @@ def main_agent():
         print("Playing audio....")
 
         file_path = src.text_to_speech.text_to_speech(clean_message)
-        # playsound.playsound(file_path)
+        playsound.playsound(file_path)
         
 
         if response.endswith("<END_OF_CALL>"):
