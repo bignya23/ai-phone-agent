@@ -5,26 +5,33 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import { toast } from "react-hot-toast";
 
 const HomePage = () => {
-  const [salesperson_name, setSalespersonName] = useState("");
-  const [salesperson_role, setSalespersonRole] = useState("");
-  const [company_name, setCompanyName] = useState("");
-  const [company_business, setCompanyBusiness] = useState("");
-  const [company_values, setCompanyValues] = useState("");
-  const [conversation_purpose, setConversationPurpose] = useState("");
-  const [conversation_type, setConversationType] = useState("");
+  const [salespersonName, setSalespersonName] = useState("");
+  const [salespersonRole, setSalespersonRole] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyBusiness, setCompanyBusiness] = useState("");
+  const [companyValues, setCompanyValues] = useState("");
+  const [conversationPurpose, setConversationPurpose] = useState("");
+  const [conversationType, setConversationType] = useState("");
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!salesperson_name.trim()) newErrors.salesperson_name = "This field is required.";
-    if (!salesperson_role.trim()) newErrors.salesperson_role = "This field is required.";
-    if (!company_name.trim()) newErrors.company_name = "This field is required.";
-    if (!company_business.trim()) newErrors.company_business = "This field is required.";
-    if (!company_values.trim()) newErrors.company_values = "This field is required.";
-    if (!conversation_purpose.trim()) newErrors.conversation_purpose = "This field is required.";
-    if (!conversation_type.trim()) newErrors.conversation_type = "This field is required.";
+    if (!salespersonName.trim())
+      newErrors.salespersonName = "This field is required.";
+    if (!salespersonRole.trim())
+      newErrors.salespersonRole = "This field is required.";
+    if (!companyName.trim()) newErrors.companyName = "This field is required.";
+    if (!companyBusiness.trim())
+      newErrors.companyBusiness = "This field is required.";
+    if (!companyValues.trim())
+      newErrors.companyValues = "This field is required.";
+    if (!conversationPurpose.trim())
+      newErrors.conversationPurpose = "This field is required.";
+    if (!conversationType.trim())
+      newErrors.conversationType = "This field is required.";
     return newErrors;
   };
 
@@ -37,19 +44,23 @@ const HomePage = () => {
     } else {
       setErrors({});
       const formData = {
-        salesperson_name,
-        salesperson_role,
-        company_name,
-        company_business,
-        company_values,
-        conversation_purpose,
-        conversation_type,
+        salespersonName,
+        salespersonRole,
+        companyName,
+        companyBusiness,
+        companyValues,
+        conversationPurpose,
+        conversationType,
       };
 
       try {
-        const response = await axios.post("http://127.0.0.1:5000/get_info", formData, {
-          withCredentials: true,
-        });
+        const response = await axios.post(
+          "http://127.0.0.1:5000/get_info",
+          formData,
+          {
+            withCredentials: true,
+          }
+        );
 
         console.log("Response from server:", response.data);
         toast.success("Form submitted successfully!");
@@ -61,6 +72,66 @@ const HomePage = () => {
     }
   };
 
+  const handleMicClick = async () => {
+    if (!isRecording) {
+      setIsRecording(true);
+      toast("Recording started...");
+  
+      try {
+        // Request microphone access
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+        // Initialize the MediaRecorder
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+  
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+  
+        mediaRecorder.onstop = async () => {
+          // Combine audio chunks into a Blob
+          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+  
+          // Create FormData to send the Blob to the backend
+          const formData = new FormData();
+          formData.append("audio", audioBlob, "recording.wav");
+  
+          try {
+            // Send the audio file to the backend
+            const response = await axios.post("http://127.0.0.1:5000/agent", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+  
+            console.log("Audio uploaded successfully:", response.data);
+            toast.success("Audio uploaded successfully!");
+          } catch (error) {
+            console.error("Error uploading audio:", error);
+            toast.error("Failed to upload the audio. Please try again.");
+          }
+        };
+  
+        // Start recording
+        mediaRecorder.start();
+  
+        // Stop recording after 5 seconds
+        setTimeout(() => {
+          mediaRecorder.stop();
+          stream.getTracks().forEach((track) => track.stop()); // Stop the microphone
+          setIsRecording(false);
+          toast("Recording stopped.");
+        }, 5000); // Adjust the duration as needed
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+        toast.error("Microphone access denied or not available.");
+        setIsRecording(false);
+      }
+    } else {
+      toast("Recording already in progress.");
+    }
+  };
+  
+
   return (
     <div className="h-screen grid lg:grid-cols-2">
       {/* Left Side - Form */}
@@ -71,19 +142,32 @@ const HomePage = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            style={{
+              pointerEvents: isSubmitted ? "none" : "auto",
+              opacity: isSubmitted ? 0.5 : 1,
+            }}
+          >
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Salesperson Name</span>
               </label>
               <input
                 type="text"
-                value={salesperson_name}
+                value={salespersonName}
                 onChange={(e) => setSalespersonName(e.target.value)}
                 placeholder="Enter salesperson name"
-                className={`input input-bordered w-full ${errors.salesperson_name ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.salespersonName ? "input-error" : ""
+                }`}
               />
-              {errors.salesperson_name && <p className="text-red-500 text-sm mt-1">{errors.salesperson_name}</p>}
+              {errors.salespersonName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.salespersonName}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
@@ -92,12 +176,18 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={salesperson_role}
+                value={salespersonRole}
                 onChange={(e) => setSalespersonRole(e.target.value)}
                 placeholder="Enter salesperson role"
-                className={`input input-bordered w-full ${errors.salesperson_role ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.salespersonRole ? "input-error" : ""
+                }`}
               />
-              {errors.salesperson_role && <p className="text-red-500 text-sm mt-1">{errors.salesperson_role}</p>}
+              {errors.salespersonRole && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.salespersonRole}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
@@ -106,12 +196,18 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={company_name}
+                value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Enter company name"
-                className={`input input-bordered w-full ${errors.company_name ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.companyName ? "input-error" : ""
+                }`}
               />
-              {errors.company_name && <p className="text-red-500 text-sm mt-1">{errors.company_name}</p>}
+              {errors.companyName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.companyName}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
@@ -120,12 +216,18 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={company_business}
+                value={companyBusiness}
                 onChange={(e) => setCompanyBusiness(e.target.value)}
                 placeholder="Enter company business"
-                className={`input input-bordered w-full ${errors.company_business ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.companyBusiness ? "input-error" : ""
+                }`}
               />
-              {errors.company_business && <p className="text-red-500 text-sm mt-1">{errors.company_business}</p>}
+              {errors.companyBusiness && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.companyBusiness}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
@@ -134,40 +236,62 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={company_values}
+                value={companyValues}
                 onChange={(e) => setCompanyValues(e.target.value)}
                 placeholder="Enter company values"
-                className={`input input-bordered w-full ${errors.company_values ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.companyValues ? "input-error" : ""
+                }`}
               />
-              {errors.company_values && <p className="text-red-500 text-sm mt-1">{errors.company_values}</p>}
+              {errors.companyValues && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.companyValues}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Conversation Purpose</span>
+                <span className="label-text font-medium">
+                  Conversation Purpose
+                </span>
               </label>
               <input
                 type="text"
-                value={conversation_purpose}
+                value={conversationPurpose}
                 onChange={(e) => setConversationPurpose(e.target.value)}
                 placeholder="Enter purpose of conversation"
-                className={`input input-bordered w-full ${errors.conversation_purpose ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.conversationPurpose ? "input-error" : ""
+                }`}
               />
-              {errors.conversation_purpose && <p className="text-red-500 text-sm mt-1">{errors.conversation_purpose}</p>}
+              {errors.conversationPurpose && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.conversationPurpose}
+                </p>
+              )}
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Conversation Type</span>
+                <span className="label-text font-medium">
+                  Conversation Type
+                </span>
               </label>
               <input
                 type="text"
-                value={conversation_type}
+                value={conversationType}
                 onChange={(e) => setConversationType(e.target.value)}
                 placeholder="Enter type of conversation"
-                className={`input input-bordered w-full ${errors.conversation_type ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.conversationType ? "input-error" : ""
+                }`}
               />
-              {errors.conversation_type && <p className="text-red-500 text-sm mt-1">{errors.conversation_type}</p>}
+              {errors.conversationType && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.conversationType}
+                </p>
+              )}
             </div>
 
             <button type="submit" className="btn btn-primary w-full">
@@ -185,8 +309,16 @@ const HomePage = () => {
         />
       ) : (
         <div className="flex flex-col justify-center items-center">
-          <Mic className="w-16 h-16 text-primary" />
-          <p className="text-xl font-semibold mt-4">Tap to Speak</p>
+          <button onClick={handleMicClick} className="focus:outline-none">
+            <Mic
+              className={`w-16 h-16 ${
+                isRecording ? "text-red-500" : "text-primary"
+              }`}
+            />
+          </button>
+          <p className="text-xl font-semibold mt-4">
+            {isRecording ? "Recording..." : "Tap to Speak"}
+          </p>
         </div>
       )}
     </div>
