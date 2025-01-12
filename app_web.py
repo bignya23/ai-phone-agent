@@ -87,15 +87,17 @@ def main_agent():
         print("Playing audio....")
 
         file_path = src.text_to_speech.text_to_speech(clean_message)
+        # fronend play
         playsound.playsound(file_path)
         
-
+    
         if response.endswith("<END_OF_CALL>"):
             break
-
+        
+        # frontend recording file 
         filename = speech_to_text.audio_file()
         user_input = speech_to_text.speech_to_text(filename)
-        user_input = input("You: ")
+        # user_input = input("You: ")
         print(user_input)
         conversation_history += f"Sales Agent: {clean_message}\n"
 

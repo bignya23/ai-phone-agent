@@ -16,10 +16,10 @@ def save_audio_from_response(response):
     Save WAV audio directly from the API response to a file.
     """
 
-
-    id = uuid.uuid4()
-    os.makedirs("/static/audio", exist_ok=True)
-    file_name = os.path.join(f"/static/audio/{id}.wav")
+    
+    os.makedirs("frontend/src/audio", exist_ok=True)
+    file_name = os.path.join("frontend/src/audio" , "input_new.wav")
+    print(file_name)
     if response.status_code == 200:
         # Load audio content into a BytesIO stream
         audio_stream = BytesIO(response.content)
