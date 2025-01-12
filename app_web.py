@@ -1,10 +1,8 @@
 from flask import Flask, request, redirect, url_for, jsonify, send_file
 from flask_cors import CORS
-import requests
 import agent
 import speech_to_text
 import src.text_to_speech
-import time
 import os
 
 app = Flask(__name__)
@@ -31,13 +29,13 @@ def get_info():
     
     return jsonify(inputs)
 
-@app.route("/agent", methods=["POST"])
+@app.route("/agent", methods=["GET"])
 def main_agent():
     global conversation_history
     global user_input
     global inputs
 
-    
+
     # Generate response from agent
     response = agent.sales_conversation(
         inputs["salesperson_name"],
@@ -49,6 +47,7 @@ def main_agent():
         inputs["conversation_type"],
         conversation_history
     )
+
 
     clean_message = response
     isendofcall = False
@@ -66,15 +65,17 @@ def main_agent():
 
     return jsonify({
         "message": clean_message,
-        "audioUrl": f"/audio/{os.path.basename(audio_file_path)}",
+        "audioUrl": audio_file_path,
         "isEndOfCall": isendofcall
     })
 
 
-@app.route("/upload-audio", methods=["POST"])
+@app.route("/upload_audio", methods=["POST"])
 def upload_audio():
     global conversation_history
     global user_input
+    global inputs
+
 
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
@@ -117,7 +118,7 @@ def upload_audio():
 
     return jsonify({
         "message": clean_message,
-        "audioUrl": f"/audio/{os.path.basename(audio_file_path)}",
+        "audioUrl": audio_file_path,
         "isEndOfCall": isendofcall
     })
 
