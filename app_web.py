@@ -81,7 +81,7 @@ def upload_audio():
         return jsonify({"error": "No audio file provided"}), 400
 
     audio_file = request.files['audio']
-    
+    print("Audio Recieved")
     # Save the received audio file temporarily
     temp_filename = "frontend_recording.wav"
     audio_file.save(temp_filename)
@@ -101,7 +101,7 @@ def upload_audio():
         inputs["conversation_type"],
         conversation_history
     )
-
+    print("GEneratiing ")
     clean_message = response
     isendofcall = False
     if response.endswith("<END_OF_TURN>"):

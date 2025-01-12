@@ -145,7 +145,7 @@ const HomePage = () => {
 
   const sendAudioToServer = async (audioBlob) => {
     const formData = new FormData();
-    formData.append("file", audioBlob, "user-audio.wav");
+    formData.append("audio", audioBlob, "user-audio.wav");
 
     try {
       const response = await axios.post(
