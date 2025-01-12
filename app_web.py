@@ -76,7 +76,7 @@ def upload_audio():
     global user_input
     global inputs
 
-
+    
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
