@@ -16,7 +16,7 @@ const HomePage = () => {
   const [conversationType, setConversationType] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [audioUrl, setAudioUrl] = useState(null); // State to store the audio URL
-
+  const [isMicActive, setIsMicActive] = useState(false); 
   // Error state
   const [errors, setErrors] = useState({});
 
@@ -85,6 +85,7 @@ const HomePage = () => {
   // Handle the mic button click to send GET request to /agent route
   const handleMicClick = async () => {
     try {
+      setIsMicActive(true);
       // First, get the audio URL from the server
       const response = await axios.get("http://127.0.0.1:5000/agent");
       console.log("Audio URL from server:", response.data.audioUrl);
@@ -354,7 +355,11 @@ const HomePage = () => {
           <div className="flex flex-col justify-center items-center">
             <Mic
               onClick={handleMicClick} // Add the click event handler to the mic icon
-              className="w-16 h-16 text-primary cursor-pointer"
+              className={`w-16 h-16 text-primary cursor-pointer transition-all duration-200 ${
+                isMicActive
+                  ? "text-red-500 transform scale-110"
+                  : "text-primary"
+              }`} // Apply dynamic styles based on mic's active state
             />
             <p className="text-xl font-semibold mt-4">Tap to Speak</p>
 
