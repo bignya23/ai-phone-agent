@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 const HomePage = () => {
   // Form fields state
   // Form fields state
+  // Form fields state
   const [salespersonName, setSalespersonName] = useState("");
   const [salespersonRole, setSalespersonRole] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -15,20 +16,25 @@ const HomePage = () => {
   const [conversationPurpose, setConversationPurpose] = useState("");
   const [conversationType, setConversationType] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null); // State to store the audio URL
+  const [audioUrl, setAudioUrl] = useState(null);
   const [isMicActive, setIsMicActive] = useState(false);
-  // Error state
   const [errors, setErrors] = useState({});
-
-  // State to track audio recording status
   const [isRecording, setIsRecording] = useState(false);
   const [isWaitingForAudio, setIsWaitingForAudio] = useState(false);
 
-  const audioRecorderRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
 
-  // Validate form fields
+  useEffect(() => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+        toast.error("Failed to play audio. Please try again.");
+      });
+    }
+  }, [audioUrl]);
+
   const validateForm = () => {
     const newErrors = {};
     if (!salespersonName.trim())
@@ -50,12 +56,10 @@ const HomePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
-
-    // If there are validation errors, set them in the state
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
-      setErrors({}); // Reset errors if form is valid
+      setErrors({});
       const formData = {
         salespersonName,
         salespersonRole,
@@ -82,29 +86,23 @@ const HomePage = () => {
     }
   };
 
-  // Handle the mic button click to send GET request to /agent route
   const handleMicClick = async () => {
     try {
       setIsMicActive(true);
-
-      // Get the audio URL from the server
       const response = await axios.get("http://127.0.0.1:5000/agent");
       console.log("Audio URL from server:", response.data.audioUrl);
       setAudioUrl(response.data.audioUrl);
 
-      // Play the received audio file
       const audio = new Audio(response.data.audioUrl);
       audio.play();
 
-      // After audio finishes playing, start recording
       audio.onended = async () => {
-        setIsWaitingForAudio(true);
-        await startRecording(); // Start recording user's voice
+        await startRecording();
       };
     } catch (error) {
       console.error("Error fetching audio:", error);
       toast.error("Failed to get audio. Please try again.");
-      setIsMicActive(false); // Reset mic state if an error occurs
+      setIsMicActive(false);
     }
   };
 
@@ -113,7 +111,7 @@ const HomePage = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
 
-      chunksRef.current = []; // Reset the chunks array
+      chunksRef.current = [];
       mediaRecorderRef.current.ondataavailable = (event) => {
         chunksRef.current.push(event.data);
       };
@@ -122,7 +120,7 @@ const HomePage = () => {
         const audioBlob = new Blob(chunksRef.current, { type: "audio/wav" });
         console.log("Recorded audio blob:", audioBlob);
 
-        await sendAudioToServer(audioBlob); // Send recorded audio to the server
+        await sendAudioToServer(audioBlob);
       };
 
       mediaRecorderRef.current.start();
@@ -145,7 +143,7 @@ const HomePage = () => {
 
   const sendAudioToServer = async (audioBlob) => {
     const formData = new FormData();
-    formData.append("audio", audioBlob, "user-audio.wav");
+    formData.append("file", audioBlob, "user-audio.wav");
 
     try {
       const response = await axios.post(
@@ -157,26 +155,27 @@ const HomePage = () => {
           },
         }
       );
-      console.log("Server response:", response.data);
+
       const { audioUrl } = response.data;
       setAudioUrl(audioUrl);
 
-      // Play the server response audio
       const audio = new Audio(audioUrl);
       audio.play();
     } catch (error) {
       console.error("Error sending audio to server:", error);
       toast.error("Failed to send audio. Please try again.");
+    } finally {
+      setIsWaitingForAudio(false);
     }
   };
 
   useEffect(() => {
     if (isRecording && isWaitingForAudio) {
       const silenceTimeout = setTimeout(() => {
-        stopRecording(); // Stop recording after 3 seconds of silence
+        stopRecording();
       }, 3000);
 
-      return () => clearTimeout(silenceTimeout); // Cleanup timeout
+      return () => clearTimeout(silenceTimeout);
     }
   }, [isRecording, isWaitingForAudio]);
 
@@ -357,51 +356,56 @@ const HomePage = () => {
         </div>
       </div>
 
-   {/* Right Side - Image/Pattern */}
-<div className="h-screen flex flex-col items-center justify-center">
-  {!isSubmitted ? (
-    <AuthImagePattern
-      title={"Welcome to the Form"}
-      subtitle={"Submit the details on the left panel to proceed."}
-    />
-  ) : (
-    <div className="flex flex-col justify-center items-center">
-      <Mic
-        onClick={handleMicClick} // Add the click event handler to the mic icon
-        className={`w-16 h-16 text-primary cursor-pointer transition-all duration-200 ${
-          isMicActive ? "text-red-500 transform scale-110" : "text-primary"
-        }`} // Apply dynamic styles based on mic's active state
-      />
-      <p className="text-xl font-semibold mt-4">Tap to Speak</p>
+      {/* Right Side - Image/Pattern */}
+      <div className="h-screen flex flex-col items-center justify-center">
+        {!isSubmitted ? (
+          <AuthImagePattern
+            title={"Welcome to the Form"}
+            subtitle={"Submit the details on the left panel to proceed."}
+          />
+        ) : (
+          <div className="flex flex-col justify-center items-center">
+            <Mic
+              onClick={handleMicClick}
+              className={`w-16 h-16 text-primary cursor-pointer transition-all duration-200 ${
+                isMicActive
+                  ? "text-red-500 transform scale-110"
+                  : "text-primary"
+              }`}
+            />
+            <p className="text-xl font-semibold mt-4">Tap to Speak</p>
 
-      {/* Optionally display the audio player if audioUrl is present */}
-      {audioUrl && !isRecording && (
-        <audio controls autoPlay>
-          <source src={audioUrl} type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
-      )}
+            {isWaitingForAudio && (
+              <div className="flex flex-col items-center mt-6">
+                <div className="text-blue-500 text-lg font-semibold animate-pulse">
+                  Processing your audio...
+                </div>
+                <p className="text-gray-500 text-sm mt-2">
+                  Please wait a moment.
+                </p>
+              </div>
+            )}
 
-      {/* Show "Speak Now" message when waiting for user input */}
-      {isWaitingForAudio && !isRecording && (
-        <p className="text-xl font-semibold mt-4">Speak Now</p>
-      )}
+            {audioUrl && !isRecording && (
+              <audio controls autoPlay>
+                <source src={audioUrl} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            )}
 
-      {/* Show "Recording..." when recording is active */}
-      {isRecording && (
-        <div className="flex flex-col items-center mt-6">
-          <div className="text-red-500 text-lg font-semibold animate-pulse">
-            Recording...
+            {isRecording && (
+              <div className="flex flex-col items-center mt-6">
+                <div className="text-red-500 text-lg font-semibold animate-pulse">
+                  Recording...
+                </div>
+                <p className="text-gray-500 text-sm mt-2">
+                  Speak into your microphone.
+                </p>
+              </div>
+            )}
           </div>
-          <p className="text-gray-500 text-sm mt-2">
-            Speak into your microphone.
-          </p>
-        </div>
-      )}
-    </div>
-  )}
-</div>
-
+        )}
+      </div>
     </div>
   );
 };
