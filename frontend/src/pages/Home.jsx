@@ -99,7 +99,7 @@ const HomePage = () => {
   
           try {
             // Send the audio file to the backend
-            const response = await axios.post("http://127.0.0.1:5000/upload_audio", formData, {
+            const response = await axios.post("http://127.0.0.1:5000/agent", formData, {
               headers: { "Content-Type": "multipart/form-data" },
             });
   
