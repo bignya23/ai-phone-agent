@@ -5,26 +5,26 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import { toast } from "react-hot-toast";
 
 const HomePage = () => {
-  const [salespersonName, setSalespersonName] = useState("");
-  const [salespersonRole, setSalespersonRole] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [companyBusiness, setCompanyBusiness] = useState("");
-  const [companyValues, setCompanyValues] = useState("");
-  const [conversationPurpose, setConversationPurpose] = useState("");
-  const [conversationType, setConversationType] = useState("");
+  const [salesperson_name, setSalespersonName] = useState("");
+  const [salesperson_role, setSalespersonRole] = useState("");
+  const [company_name, setCompanyName] = useState("");
+  const [company_business, setCompanyBusiness] = useState("");
+  const [company_values, setCompanyValues] = useState("");
+  const [conversation_purpose, setConversationPurpose] = useState("");
+  const [conversation_type, setConversationType] = useState("");
 
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!salespersonName.trim()) newErrors.salespersonName = "This field is required.";
-    if (!salespersonRole.trim()) newErrors.salespersonRole = "This field is required.";
-    if (!companyName.trim()) newErrors.companyName = "This field is required.";
-    if (!companyBusiness.trim()) newErrors.companyBusiness = "This field is required.";
-    if (!companyValues.trim()) newErrors.companyValues = "This field is required.";
-    if (!conversationPurpose.trim()) newErrors.conversationPurpose = "This field is required.";
-    if (!conversationType.trim()) newErrors.conversationType = "This field is required.";
+    if (!salesperson_name.trim()) newErrors.salesperson_name = "This field is required.";
+    if (!salesperson_role.trim()) newErrors.salesperson_role = "This field is required.";
+    if (!company_name.trim()) newErrors.company_name = "This field is required.";
+    if (!company_business.trim()) newErrors.company_business = "This field is required.";
+    if (!company_values.trim()) newErrors.company_values = "This field is required.";
+    if (!conversation_purpose.trim()) newErrors.conversation_purpose = "This field is required.";
+    if (!conversation_type.trim()) newErrors.conversation_type = "This field is required.";
     return newErrors;
   };
 
@@ -37,20 +37,18 @@ const HomePage = () => {
     } else {
       setErrors({});
       const formData = {
-        salespersonName,
-        salespersonRole,
-        companyName,
-        companyBusiness,
-        companyValues,
-        conversationPurpose,
-        conversationType,
+        salesperson_name,
+        salesperson_role,
+        company_name,
+        company_business,
+        company_values,
+        conversation_purpose,
+        conversation_type,
       };
 
       try {
-        const response = await axios.post("http://127.0.0.1:5000/agent", formData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const response = await axios.post("http://127.0.0.1:5000/get_info", formData, {
+          withCredentials: true,
         });
 
         console.log("Response from server:", response.data);
@@ -80,12 +78,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={salespersonName}
+                value={salesperson_name}
                 onChange={(e) => setSalespersonName(e.target.value)}
                 placeholder="Enter salesperson name"
-                className={`input input-bordered w-full ${errors.salespersonName ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.salesperson_name ? "input-error" : ""}`}
               />
-              {errors.salespersonName && <p className="text-red-500 text-sm mt-1">{errors.salespersonName}</p>}
+              {errors.salesperson_name && <p className="text-red-500 text-sm mt-1">{errors.salesperson_name}</p>}
             </div>
 
             <div className="form-control">
@@ -94,12 +92,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={salespersonRole}
+                value={salesperson_role}
                 onChange={(e) => setSalespersonRole(e.target.value)}
                 placeholder="Enter salesperson role"
-                className={`input input-bordered w-full ${errors.salespersonRole ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.salesperson_role ? "input-error" : ""}`}
               />
-              {errors.salespersonRole && <p className="text-red-500 text-sm mt-1">{errors.salespersonRole}</p>}
+              {errors.salesperson_role && <p className="text-red-500 text-sm mt-1">{errors.salesperson_role}</p>}
             </div>
 
             <div className="form-control">
@@ -108,12 +106,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={companyName}
+                value={company_name}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Enter company name"
-                className={`input input-bordered w-full ${errors.companyName ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.company_name ? "input-error" : ""}`}
               />
-              {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
+              {errors.company_name && <p className="text-red-500 text-sm mt-1">{errors.company_name}</p>}
             </div>
 
             <div className="form-control">
@@ -122,12 +120,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={companyBusiness}
+                value={company_business}
                 onChange={(e) => setCompanyBusiness(e.target.value)}
                 placeholder="Enter company business"
-                className={`input input-bordered w-full ${errors.companyBusiness ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.company_business ? "input-error" : ""}`}
               />
-              {errors.companyBusiness && <p className="text-red-500 text-sm mt-1">{errors.companyBusiness}</p>}
+              {errors.company_business && <p className="text-red-500 text-sm mt-1">{errors.company_business}</p>}
             </div>
 
             <div className="form-control">
@@ -136,12 +134,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={companyValues}
+                value={company_values}
                 onChange={(e) => setCompanyValues(e.target.value)}
                 placeholder="Enter company values"
-                className={`input input-bordered w-full ${errors.companyValues ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.company_values ? "input-error" : ""}`}
               />
-              {errors.companyValues && <p className="text-red-500 text-sm mt-1">{errors.companyValues}</p>}
+              {errors.company_values && <p className="text-red-500 text-sm mt-1">{errors.company_values}</p>}
             </div>
 
             <div className="form-control">
@@ -150,12 +148,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={conversationPurpose}
+                value={conversation_purpose}
                 onChange={(e) => setConversationPurpose(e.target.value)}
                 placeholder="Enter purpose of conversation"
-                className={`input input-bordered w-full ${errors.conversationPurpose ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.conversation_purpose ? "input-error" : ""}`}
               />
-              {errors.conversationPurpose && <p className="text-red-500 text-sm mt-1">{errors.conversationPurpose}</p>}
+              {errors.conversation_purpose && <p className="text-red-500 text-sm mt-1">{errors.conversation_purpose}</p>}
             </div>
 
             <div className="form-control">
@@ -164,12 +162,12 @@ const HomePage = () => {
               </label>
               <input
                 type="text"
-                value={conversationType}
+                value={conversation_type}
                 onChange={(e) => setConversationType(e.target.value)}
                 placeholder="Enter type of conversation"
-                className={`input input-bordered w-full ${errors.conversationType ? "input-error" : ""}`}
+                className={`input input-bordered w-full ${errors.conversation_type ? "input-error" : ""}`}
               />
-              {errors.conversationType && <p className="text-red-500 text-sm mt-1">{errors.conversationType}</p>}
+              {errors.conversation_type && <p className="text-red-500 text-sm mt-1">{errors.conversation_type}</p>}
             </div>
 
             <button type="submit" className="btn btn-primary w-full">
