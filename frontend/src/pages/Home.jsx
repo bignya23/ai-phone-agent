@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Mic } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { toast } from "react-hot-toast";
 
 const HomePage = () => {
-  // Form fields state
-  // Form fields state
-  // Form fields state
+  // Form states
   const [salespersonName, setSalespersonName] = useState("");
   const [salespersonRole, setSalespersonRole] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -16,43 +14,27 @@ const HomePage = () => {
   const [conversationPurpose, setConversationPurpose] = useState("");
   const [conversationType, setConversationType] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null);
-  const [isMicActive, setIsMicActive] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Audio states
+  const [audioUrl, setAudioUrl] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [isWaitingForAudio, setIsWaitingForAudio] = useState(false);
+  const [isMicActive, setIsMicActive] = useState(false);
 
+  // Refs for audio handling
   const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
-
-  useEffect(() => {
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play();
-
-      audio.onended = () => {
-        setIsWaitingForAudio(true);
-        startRecording(); // Start recording after the audio finishes
-      };
-    }
-  }, [audioUrl]);
-
+  const streamRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!salespersonName.trim())
-      newErrors.salespersonName = "This field is required.";
-    if (!salespersonRole.trim())
-      newErrors.salespersonRole = "This field is required.";
-    if (!companyName.trim()) newErrors.companyName = "This field is required.";
-    if (!companyBusiness.trim())
-      newErrors.companyBusiness = "This field is required.";
-    if (!companyValues.trim())
-      newErrors.companyValues = "This field is required.";
-    if (!conversationPurpose.trim())
-      newErrors.conversationPurpose = "This field is required.";
-    if (!conversationType.trim())
-      newErrors.conversationType = "This field is required.";
+    if (!salespersonName.trim()) newErrors.salespersonName = "Required";
+    if (!salespersonRole.trim()) newErrors.salespersonRole = "Required";
+    if (!companyName.trim()) newErrors.companyName = "Required";
+    if (!companyBusiness.trim()) newErrors.companyBusiness = "Required";
+    if (!companyValues.trim()) newErrors.companyValues = "Required";
+    if (!conversationPurpose.trim()) newErrors.conversationPurpose = "Required";
+    if (!conversationType.trim()) newErrors.conversationType = "Required";
     return newErrors;
   };
 
@@ -61,71 +43,54 @@ const HomePage = () => {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-    } else {
-      setErrors({});
-      const formData = {
-        salespersonName,
-        salespersonRole,
-        companyName,
-        companyBusiness,
-        companyValues,
-        conversationPurpose,
-        conversationType,
-      };
-
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1:5000/get_info",
-          formData,
-          { withCredentials: true }
-        );
-        console.log("Response from server:", response.data);
-        toast.success("Form submitted successfully!");
-        setIsSubmitted(true);
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        toast.error("Failed to submit the form. Please try again.");
-      }
+      return;
     }
-  };
 
-  const handleMicClick = async () => {
     try {
-      setIsMicActive(true);
-
-      // Get the audio URL from the server
-      const response = await axios.get("http://127.0.0.1:5000/agent");
-      console.log("Audio URL from server:", response.data.audioUrl);
-      setAudioUrl(response.data.audioUrl); // Triggers the useEffect
+      const response = await axios.post(
+        "http://127.0.0.1:5000/get_info",
+        {
+          salespersonName,
+          salespersonRole,
+          companyName,
+          companyBusiness,
+          companyValues,
+          conversationPurpose,
+          conversationType,
+        },
+        { withCredentials: true }
+      );
+      setIsSubmitted(true);
+      toast.success("Form submitted successfully!");
+      handleMicClick();
     } catch (error) {
-      console.error("Error fetching audio:", error);
-      toast.error("Failed to get audio. Please try again.");
-      setIsMicActive(false);
+      toast.error("Failed to submit form. Please try again.");
     }
   };
-
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      if (!streamRef.current) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+      }
 
-      const chunks = [];
-      mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = new MediaRecorder(streamRef.current);
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: "audio/wav" });
-        await sendAudioToServer(audioBlob); // Send recorded audio to the server
-      };
-
-      mediaRecorder.start();
+      mediaRecorderRef.current.start();
       setIsRecording(true);
-      console.log("Recording started...");
+      setIsMicActive(true);
+      
     } catch (error) {
       console.error("Error starting recording:", error);
-      toast.error("Failed to access microphone.");
+      toast.error("Failed to start recording");
     }
   };
 
@@ -133,12 +98,21 @@ const HomePage = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      setIsWaitingForAudio(false);
-      console.log("Recording stopped...");
+      setIsMicActive(false);
     }
   };
 
-
+  const handleSendAudio = async () => {
+    if (!isRecording) return;
+    
+    stopRecording();
+    
+    // Wait for the last chunk to be processed
+    setTimeout(async () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+      await sendAudioToServer(audioBlob);
+    }, 100);
+  };
 
   const sendAudioToServer = async (audioBlob) => {
     const formData = new FormData();
@@ -152,23 +126,48 @@ const HomePage = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      console.log("Server response:", response.data);
-      setAudioUrl(response.data.audioUrl); // Update the audioUrl for the new response
+      setAudioUrl(response.data.audioUrl);
     } catch (error) {
-      console.error("Error sending audio to server:", error);
-      toast.error("Failed to send audio. Please try again.");
+      console.error("Error sending audio:", error);
+      toast.error("Failed to send audio");
+    }
+  };
+
+  const handleMicClick = async () => {
+    try {
+      setIsMicActive(true);
+      const response = await axios.get("http://127.0.0.1:5000/agent");
+      setAudioUrl(response.data.audioUrl);
+    } catch (error) {
+      console.error("Error fetching initial audio:", error);
+      toast.error("Failed to start conversation");
+      setIsMicActive(false);
     }
   };
 
   useEffect(() => {
-    if (isRecording && isWaitingForAudio) {
-      const silenceTimeout = setTimeout(() => {
-        stopRecording();
-      }, 3000);
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
 
-      return () => clearTimeout(silenceTimeout);
+      audio.onended = () => {
+        startRecording();
+      };
+
+      audio.play().catch(error => {
+        console.error("Error playing audio:", error);
+        toast.error("Failed to play audio");
+      });
     }
-  }, [isRecording, isWaitingForAudio]);
+  }, [audioUrl]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   return (
     <div className="h-screen grid lg:grid-cols-2">
@@ -347,51 +346,47 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Right Side - Image/Pattern */}
+
+      {/* Right Side - Conversation Interface */}
       <div className="h-screen flex flex-col items-center justify-center">
         {!isSubmitted ? (
           <AuthImagePattern
-            title={"Welcome to the Form"}
-            subtitle={"Submit the details on the left panel to proceed."}
+            title="Welcome to VoiceBuddy"
+            subtitle="Submit the form to start your conversation"
           />
         ) : (
-          <div className="flex flex-col justify-center items-center">
-            <Mic
-              onClick={handleMicClick}
-              className={`w-16 h-16 text-primary cursor-pointer transition-all duration-200 ${
-                isMicActive
-                  ? "text-red-500 transform scale-110"
-                  : "text-primary"
-              }`}
-            />
-            <p className="text-xl font-semibold mt-4">Tap to Speak</p>
+          <div className="flex flex-col items-center justify-center space-y-6">
+            <div className="flex gap-4 items-center">
+              <Mic
+                onClick={startRecording}
+                className={`w-16 h-16 cursor-pointer transition-all duration-200 ${
+                  isMicActive ? "text-red-500 scale-110" : "text-primary"
+                }`}
+              />
+              {isRecording && (
+                <Send
+                  onClick={handleSendAudio}
+                  className="w-12 h-12 cursor-pointer text-primary hover:scale-110 transition-all duration-200"
+                />
+              )}
+            </div>
 
-            {isWaitingForAudio && (
-              <div className="flex flex-col items-center mt-6">
-                <div className="text-blue-500 text-lg font-semibold animate-pulse">
-                  Processing your audio...
+            {isRecording && (
+              <div className="flex flex-col items-center">
+                <div className="text-red-500 text-lg font-semibold animate-pulse">
+                  Recording...
                 </div>
                 <p className="text-gray-500 text-sm mt-2">
-                  Please wait a moment.
+                  Click send when you're done speaking
                 </p>
               </div>
             )}
 
             {audioUrl && !isRecording && (
-              <audio controls autoPlay>
-                <source src={audioUrl} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            )}
-
-            {isRecording && (
-              <div className="flex flex-col items-center mt-6">
-                <div className="text-red-500 text-lg font-semibold animate-pulse">
-                  Recording...
+              <div className="flex flex-col items-center">
+                <div className="text-blue-500 text-lg font-semibold">
+                  Playing response...
                 </div>
-                <p className="text-gray-500 text-sm mt-2">
-                  Speak into your microphone.
-                </p>
               </div>
             )}
           </div>

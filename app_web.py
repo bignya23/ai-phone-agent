@@ -1,9 +1,9 @@
-from flask import Flask, request, redirect, url_for, jsonify, send_file
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 import agent
 import speech_to_text
 import src.text_to_speech
-import os
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
@@ -35,7 +35,6 @@ def main_agent():
     global user_input
     global inputs
 
-
     # Generate response from agent
     response = agent.sales_conversation(
         inputs["salesperson_name"],
@@ -48,7 +47,6 @@ def main_agent():
         conversation_history
     )
 
-
     clean_message = response
     isendofcall = False
     if response.endswith("<END_OF_TURN>"):
@@ -59,7 +57,10 @@ def main_agent():
         isendofcall = True
 
     # Generate audio file
-    audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+    try:
+        audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
     
     conversation_history += f"Sales Agent: {clean_message}\n"
 
@@ -69,28 +70,31 @@ def main_agent():
         "isEndOfCall": isendofcall
     })
 
-
 @app.route("/upload_audio", methods=["POST"])
 def upload_audio():
     global conversation_history
     global user_input
     global inputs
 
-    
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
     audio_file = request.files['audio']
-    print("Audio Recieved")
+    print("Audio Received")
+
     # Save the received audio file temporarily
     temp_filename = "frontend_recording.wav"
     audio_file.save(temp_filename)
     
     # Convert speech to text
-    user_input = speech_to_text.speech_to_text(temp_filename)
-
+    try:
+        user_input = speech_to_text.speech_to_text(temp_filename)
+    except Exception as e:
+        return jsonify({"error": f"Failed to process audio: {str(e)}"}), 500
+    
     conversation_history += f"User: {user_input}\n"
     
+    # Generate response from agent
     response = agent.sales_conversation(
         inputs["salesperson_name"],
         inputs["salesperson_role"],
@@ -101,7 +105,8 @@ def upload_audio():
         inputs["conversation_type"],
         conversation_history
     )
-    print("GEneratiing ")
+    print("Generating response")
+
     clean_message = response
     isendofcall = False
     if response.endswith("<END_OF_TURN>"):
@@ -112,9 +117,15 @@ def upload_audio():
         isendofcall = True
 
     # Generate audio file
-    audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+    try:
+        audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
     
     conversation_history += f"Sales Agent: {clean_message}\n"
+    
+    # Clean up temporary audio file
+    os.remove(temp_filename)
 
     return jsonify({
         "message": clean_message,
@@ -122,8 +133,5 @@ def upload_audio():
         "isEndOfCall": isendofcall
     })
 
-
 if __name__ == "__main__":
     app.run(debug=True)
-
- 
