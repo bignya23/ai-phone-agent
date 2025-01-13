@@ -80,6 +80,27 @@ AI Phone Agent is an innovative application designed to handle cold calls for bu
 
 ---
 
+## Usage (Web Interface)  
+
+1. **Fill Out the Form**:  
+   - Start by filling out the form on the web interface with the necessary details (e.g., name, contact information, product preferences, etc.).  
+
+2. **Start Speaking**:  
+   - Once the form is submitted, the system will prompt you to start recording your response.  
+   - Speak clearly into the microphone to ensure accurate transcription.  
+
+3. **Stop Recording**:  
+   - After completing your response, click the **arrow button** to stop the recording process.  
+
+4. **Agent Processing**:  
+   - The AI Phone Agent will process your input, generate a response using the integrated LLM, and execute any necessary actions or tools.  
+
+5. **Receive Response**:  
+   - The system will provide the AI-generated response through text and audio, mimicking a real call experience.  
+
+---
+
+For a seamless experience, ensure that your microphone permissions are enabled in your browser. 
 ## Contributing  
 We welcome contributions! Feel free to fork this repository, submit pull requests, or report issues.  
 
