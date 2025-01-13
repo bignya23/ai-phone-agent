@@ -26,7 +26,8 @@ def get_info():
         "company_business": data.get("companyBusiness"),
         "company_values": data.get("companyValues"),
         "conversation_purpose": data.get("conversationPurpose"),
-        "conversation_type": data.get("conversation_type")
+        "conversation_type": data.get("conversation_type"),
+        "use_tools" : data.get("use_tools")
     }
     
     return jsonify(inputs)
@@ -99,13 +100,14 @@ def upload_audio():
     
     conversation_history += f"User: {user_input}\n"
     print(user_input)
-    tools_response_json = agent.conversation_tool(conversation_history)
-    print(f"Tools : {tools_response_json}\n")
     tools_response = ""
-    if tools_response_json != "NO":
-        tools_response = src.tools.get_tools_response(tools_response_json)
+    if inputs["use_tools"] == "true":
+        tools_response_json = agent.conversation_tool(conversation_history)
+        print(f"Tools : {tools_response_json}\n")
+        if tools_response_json != "NO":
+            tools_response = src.tools.get_tools_response(tools_response_json)
 
-    print(f"Tools Response {tools_response}" )
+        print(f"Tools Response {tools_response}" )
     
     # Generate response from agent
     response = agent.sales_conversation_with_tools(
