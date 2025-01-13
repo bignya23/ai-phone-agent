@@ -9,10 +9,10 @@ CHUNK = 1024  # Frames per buffer
 FORMAT = pyaudio.paInt16  # Audio format
 CHANNELS = 1  # Mono
 RATE = 16000  # Sampling rate
-SILENCE_THRESHOLD = 500  # RMS threshold for silence
+SILENCE_THRESHOLD = 2000  # RMS threshold for silence
 SILENCE_DURATION = 1.0  # Silence duration in seconds to trigger save
 SILENCE_DELAY = 5  # Number of consecutive silent chunks to confirm silence
-DETECTION_START_SECONDS = 1  # Time in seconds before silence detection begins
+DETECTION_START_SECONDS = 1.5  # Time in seconds before silence detection begins
 
 def detect_silence(audio_chunk):
     """Detect silence based on RMS energy."""

@@ -10,57 +10,82 @@ from langchain.schema import Document
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.agents import tool, create_tool_calling_agent
 from src.variables import company_name
-
-def knowledge_base(query: str):
+import requests
+import json
+def knowledge_base(product_name: str):
     """Retrieve information related to a query."""
 
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+    # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
-    vector_store = FAISS.load_local("vector_store/knowledge_base", embeddings,allow_dangerous_deserialization=True)
+    # vector_store = FAISS.load_local("vector_store/knowledge_base", embeddings,allow_dangerous_deserialization=True)
 
-    retirivals = vector_store.similarity_search(query, k=2)
-    content = "\n".join(doc.page_content for doc in retirivals)
-    return content
+    # retirivals = vector_store.similarity_search(product_name, k=2)
+    # content = "\n".join(doc.page_content for doc in retirivals)
+    return f"The {product_name} is available is our website so visit website for more details."
 
-def generate_calendly_invitation_link(query):
-    '''Generate a calendly invitation link based on the single query string'''
-    event_type_uuid = os.getenv("CALENDLY_EVENT_UUID")
-    api_key = os.getenv('CALENDLY_API_KEY')
-    headers = {
-        'Authorization': f'Bearer {api_key}',
-        'Content-Type': 'application/json'
-    }
-    url = 'https://api.calendly.com/scheduling_links'
-    payload = {
-    "max_event_count": 1,
-    "owner": f"https://api.calendly.com/event_types/{event_type_uuid}",
-    "owner_type": "EventType"
-    }
-    
-    
-    response = requests.post(url, json=payload, headers=headers)
-    if response.status_code == 201:
-        data = response.json()
-        return f"url: {data['resource']['booking_url']}"
-    else:
-        return "Failed to create Calendly link: "
 
-def payment_upi():
-    return f"Payment Upi id : {company_name}@okaxis" 
+def payment_upi(amount):
+    return f"Payment Upi id : {company_name}@okaxis for amount: {amount}" 
 
 def payment_link(amount):
+    return f"Payment Link : https://razorpay.com/100 for {amount}"
 
-    return "Payment Link : https://razorpay.com/{100....}"
+def schedule_call(date: str, time: str):
+    return f"Call Scheduled... for {date} and {time}"
 
+def get_tools_response(json_str):
 
-def execute_tools(response):
+    tool_name, tools_args = extract_tool_info(json_str)
 
-    if response == "No":
-        return 
+    if tool_name == "knowledge_base":
+        arg1 = tools_args[0]
+        return knowledge_base(arg1)
+    elif tool_name == "schedule_call":
+        arg1 = tools_args[0]
+        arg2 = tools_args[0]
+        return schedule_call(arg1, arg2)
+    elif tool_name == "payment_upi":
+        arg1 = tools_args[0]
+        return payment_upi(arg1)
+    elif tool_name == "payment_link":
+        arg1 = tools_args[0]
+        return payment_link(arg1)
     else:
-        pass
+        return "Tool Not found!!!"
+    
+
+def extract_tool_info(json_str):
+
+
+    data = json.loads(json_str)
         
+    tools_ = data['tools_to_use'][0]['tool_name']
+# Extract just the values from arguments into an array
+    arguments_array = list(data['tools_to_use'][0]['arguments'].values())
+    print(tools_)
+    print(arguments_array)
+
+    return tools_, arguments_array
+
     
 
 if __name__ == "__main__":
-    print(combine_tools())
+    json_str = '''
+    {
+    "tools_to_use": [
+        {
+        "tool_name": "knowledge_base",
+        "arguments": {
+            "product_name": "thermostat",
+            "new_name" : "asfsdfadf",
+            "dfasdfd" : "fasfdsfda"
+        }
+        }
+    ]
+    }
+    '''
+
+    
+    extract_tool_info(json_str)
+
+    

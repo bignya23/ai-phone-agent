@@ -12,6 +12,7 @@ from pydub.playback import play
 import time
 from playsound import playsound
 from speech_to_text import audio_file, speech_to_text
+from src.tools import extract_tool_info
 conversation_stage_id = 1
 
 def get_conversation_stage(conversation_history=""):
@@ -19,7 +20,6 @@ def get_conversation_stage(conversation_history=""):
     global conversation_stage_id
     chain = conversation_stage_chain(get_llm())
     try:
-        # Prepare input for the agent
         response = chain.invoke({
             "conversation_stage_id" : conversation_stage_id,
             "conversation_history": conversation_history,
@@ -40,14 +40,14 @@ def conversation_tool(conversation_history=""):
             "conversation_history": conversation_history
         })
 
-        # Run the agent
         return response
     except Exception as e:
         return f"Error: {str(e)}"
 
 
+# salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type, 
 
-def sales_conversation(salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type, conversation_history=""):
+def sales_conversation(tools_response = "", conversation_history=""):
     chain = conversation_chain(get_llm())
 
     try:
@@ -59,12 +59,68 @@ def sales_conversation(salesperson_name, salesperson_role, company_name, company
             "company_values" :company_values,
             "conversation_purpose": conversation_purpose,
             "conversation_type" : conversation_type,
-            "conversation_history": conversation_history
+            "conversation_history": conversation_history,
+            "tools_response" : tools_response
         })
         
         return response
     except Exception as e:
         return f"Error: {str(e)}"
+
+
+
+
+def main():
+    conversation_history = ""
+    user_input = ""
+    
+    while True:
+        conversation_history += f"User : {user_input}\n"
+        start = time.time()
+        tools_response_json = conversation_tool(conversation_history)
+        print(f"Tools : {tools_response_json}\n")
+        tools_response = ""
+        if tools_response_json != "NO":
+            tools_response = get_tools_response(tools_response_json)
+
+
+        response = sales_conversation(tools_response, conversation_history)
+
+        clean_message = response
+
+        if response.endswith("<END_OF_TURN>"):
+            clean_message = response.split("<END_OF_TURN>")[0].strip()
+        
+        if response.endswith("<END_OF_CALL>"):
+            clean_message = response.split("<END_OF_CALL>")[0].strip()
+
+
+        print(f"Sales Agent: {clean_message}")
+        # messages = [clean_message]
+        # if len(clean_message) > 150:
+        #     messages = split_message_at_middle_period(clean_message)
+        
+    
+        # await text_to_speech(response)
+        end = time.time()
+        
+        print(f"Time Taken : {end - start}")
+        # print("Playing audio....")
+
+        # file_path = text_to_speech(clean_message)
+        # playsound(file_path)
+
+        if response.endswith("<END_OF_CALL>"):
+            break
+        user_input = input("You: ")
+        # filename = audio_file()
+        # user_input = speech_to_text(filename)
+        conversation_history += f"Sales Agent: {clean_message}\n"
+
+if __name__ == "__main__":
+    main()
+
+
 
 # def split_message_at_middle_period(message):
 #     mid_index = len(message) // 2  # Find the middle index
@@ -85,50 +141,3 @@ def sales_conversation(salesperson_name, salesperson_role, company_name, company
     
 #     # Split the message at the closest full stop
 #     return [message[:split_index].strip(), message[split_index:].strip()]
-
-
-def main():
-    conversation_history = ""
-    user_input = ""
-    
-    while True:
-        conversation_history += f"User : {user_input}\n"
-        # current_stage = conversation_tool(conversation_history)
-        # print(f"Tool : {current_stage}\n")
-        start = time.time()
-        response = sales_conversation(conversation_history)
-
-        if response.endswith("<END_OF_TURN>"):
-            clean_message = response.split("<END_OF_TURN>")[0].strip()
-        
-        if response.endswith("<END_OF_CALL>"):
-            clean_message = response.split("<END_OF_CALL>")[0].strip()
-
-
-        print(f"Sales Agent: {clean_message}")
-        # messages = [clean_message]
-        # if len(clean_message) > 150:
-        #     messages = split_message_at_middle_period(clean_message)
-        
-    
-        # await text_to_speech(response)
-        end = time.time()
-        
-        print(f"Time Taken : {end - start}")
-        print("Playing audio....")
-
-        file_path = text_to_speech(clean_message)
-        playsound(file_path)
-
-        if response.endswith("<END_OF_CALL>"):
-            break
-        # user_input = input("You: ")
-        filename = audio_file()
-        user_input = speech_to_text(filename)
-        conversation_history += f"Sales Agent: {clean_message}\n"
-
-if __name__ == "__main__":
-    main()
-
-
-

@@ -75,7 +75,7 @@ def main_agent():
         playsound.playsound(file_path)
 
         if response.endswith("<END_OF_CALL>"):
-            pass
+            break
             # user_input = input("You: ")
         filename = speech_to_text.audio_file()
         user_input = speech_to_text.speech_to_text(filename)

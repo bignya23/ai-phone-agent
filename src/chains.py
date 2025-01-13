@@ -56,6 +56,7 @@ def conversation_chain(llm):
             "conversation_purpose",
             "conversation_type",
             "conversation_history",
+            "tools_response"
             ],
     )
 
