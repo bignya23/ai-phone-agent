@@ -16,7 +16,6 @@ def save_audio_from_response(response):
     Save WAV audio directly from the API response to a file.
     """
 
-
     os.makedirs("frontend/src/audio", exist_ok=True)
     id = uuid.uuid4()
     file_name = os.path.join("frontend/src/audio" , f"{id}.wav")
@@ -97,6 +96,7 @@ def text_to_speech(input_response="What is the weather report in india"):
     print(end_in - start_in)
     # Play audio directly from the response
     return save_audio_from_response(response)
+
 if __name__ == "__main__":
     start = time.time()
     text_to_speech()

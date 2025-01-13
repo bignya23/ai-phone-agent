@@ -96,21 +96,18 @@ def speech_to_text(filename):
     # Initialize the Groq client
     client = Groq()
 
-    # Specify the path to the audio file
-    # filename = "audio_segment.wav"# Replace with your audio file!
 
     # Open the audio file
     with open(filename, "rb") as file:
-        # Create a transcription of the audio file
         transcription = client.audio.transcriptions.create(
-        file=(filename, file.read()), # Required audio file
-        model="whisper-large-v3-turbo", # Required model to use for transcription
-        prompt="Specify context or spelling",  # Optional
-        response_format="json",  # Optional
-        language="en",  # Optional
-        temperature=0.0  # Optional
+        file=(filename, file.read()), 
+        model="whisper-large-v3-turbo", 
+        prompt="Specify context or spelling",  
+        response_format="json",  
+        language="en",  
+        temperature=0.0  
         )
-        # Print the transcription text
+
         return transcription.text
 
 if __name__ == "__main__":

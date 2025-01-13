@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import agent
-import speech_to_text
+import src.speech_to_text as speech_to_text
 import src.text_to_speech
 
 app = Flask(__name__)

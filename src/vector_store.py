@@ -1,12 +1,6 @@
-
-from langchain.tools import Tool
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 from langchain_core.vectorstores import InMemoryVectorStore
-import os
-from langchain.schema import Document
 from langchain.text_splitter import CharacterTextSplitter
 
 def vector_index():
@@ -21,8 +15,8 @@ def vector_index():
 
     text_splitter = CharacterTextSplitter(
     separator="\n",
-    chunk_size=100,  # Maximum characters in a chunk
-    chunk_overlap=10  # Overlap between chunks for better context
+    chunk_size=250, 
+    chunk_overlap=50
 )
 
     chunks = text_splitter.split_text(content)

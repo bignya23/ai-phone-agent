@@ -1,4 +1,4 @@
-import speech_to_text as speech_to_text
+import src.speech_to_text as speech_to_text
 # import test.aiagent as aiagent
 import src.text_to_speech as text_to_speech
 import time
