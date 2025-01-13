@@ -1,8 +1,8 @@
 from src.models import get_llm,gemini_llm
 from langchain.tools import Tool
 from langchain.prompts import PromptTemplate
-from src.chains import conversation_chain, conversation_stage_chain, conversation_tool_chain
-from src.text_to_speech import text_to_speech, play_audio_from_response
+from src.chains import conversation_chain, conversation_stage_chain, conversation_tool_chain, conversation_chain_with_tools
+from src.text_to_speech import text_to_speech
 from src.variables import *
 from src.tools import *
 from src.stages import CONVERSATION_STAGES
@@ -60,6 +60,26 @@ def sales_conversation(salesperson_name, salesperson_role, company_name, company
             "conversation_purpose": conversation_purpose,
             "conversation_type" : conversation_type,
             "conversation_history": conversation_history
+        })
+        
+        return response
+    except Exception as e:
+        return f"Error: {str(e)}"
+    
+def sales_conversation_with_tools(salesperson_name, salesperson_role, company_name, company_business, company_values, conversation_purpose, conversation_type, tools_response = "", conversation_history=""):
+    chain = conversation_chain_with_tools(get_llm())
+
+    try:
+        response = chain.invoke({
+            "salesperson_name" : salesperson_name,
+            "salesperson_role" : salesperson_role,
+            "company_name" : company_name,
+            "company_business": company_business,
+            "company_values" :company_values,
+            "conversation_purpose": conversation_purpose,
+            "conversation_type" : conversation_type,
+            "conversation_history": conversation_history,
+            "tools_response" : tools_response
         })
         
         return response

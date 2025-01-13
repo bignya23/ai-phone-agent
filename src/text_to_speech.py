@@ -1,3 +1,115 @@
+# from smallest import Smallest
+# import os
+# from dotenv import load_dotenv
+# import time
+# import uuid
+# load_dotenv()
+
+# client = Smallest(api_key=os.getenv("WAVES_API_KEY_1"))
+
+# def text_to_speech(llm_response):
+#     id = uuid.uuid4()
+#     os.makedirs("frontend/src/audio", exist_ok=True)
+#     full_path = os.path.join("frontend/src/audio" , f"{id}.wav")
+
+#     client.synthesize(
+#     llm_response,
+#     voice = "deepika",
+#     save_as=full_path,
+#     speed=1.3)
+
+#     return f"src/audio/{id}.wav"
+
+# if __name__ == "__main__":
+#     start = time.time()
+#     print(text_to_speech("What is the weather report in india"))
+#     end = time.time()
+#     print(end - start)
+
+
+
+# import asyncio
+# import os
+# import uuid
+# from dotenv import load_dotenv
+# from smallest import AsyncSmallest
+# import aiofiles
+# import time
+# load_dotenv()
+
+# client = AsyncSmallest(api_key=os.getenv("WAVES_API_KEY_1"))
+
+
+# async def text_to_speech(llm_response):
+#     id = uuid.uuid4()
+#     os.makedirs("frontend/src/audio", exist_ok=True)
+#     full_path = os.path.join("frontend/src/audio", f"{id}.wav")
+
+#     async with client as tts:
+#         audio_bytes = await tts.synthesize(llm_response,
+#             voice="deepika",
+#             save_as=full_path,
+#             speed=1.3,
+#         )
+        
+#         async with aiofiles.open(full_path, "wb") as f:
+#             await f.write(audio_bytes)
+
+#     return f"src/audio/{id}.wav"
+
+
+# if __name__ == "__main__":
+#     start = time.time()
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     audio_path = loop.run_until_complete(text_to_speech("what is the weather report in india"))
+#     loop.close()
+   
+#     end = time.time()
+#     print(end - start)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import time
 import os
 import requests
@@ -29,7 +141,7 @@ def save_audio_from_response(response):
             with wave.open(file_name, 'wb') as output_file:
                 # Copy audio parameters
                 output_file.setnchannels(wf.getnchannels())
-                output_file.setsampwidth(wf.getsampwidth())
+                output_file.setsampwidth(wf.getsampwidth()) 
                 output_file.setframerate(wf.getframerate())
                 # Write audio frames
                 output_file.writeframes(wf.readframes(wf.getnframes()))
@@ -107,64 +219,6 @@ if __name__ == "__main__":
 
 
 
-# from smallest import Smallest
-# import os
-# import uuid
-
-# def text_to_speech(llm_response: str) -> str:
-#     """
-#     Convert text to speech using the Smallest TTS library.
-    
-#     Args:
-#         llm_response (str): The text to convert to speech
-        
-#     Returns:
-#         str: The relative path to the generated audio file
-#     """
-#     try:
-#         # Get API key and initialize client
-#         api_key = os.getenv("WAVES_API_KEY")
-#         if not api_key:
-#             raise ValueError("WAVES_API_KEY environment variable is not set")
-            
-#         client = Smallest(api_key=api_key)
-
-#         # Prepare directory and filename
-#         audio_dir = "static/audio"
-#         os.makedirs(audio_dir, exist_ok=True)
-        
-#         filename = f"audio_{uuid.uuid4()}.wav"
-#         file_path = os.path.join(audio_dir, filename)
-        
-#         # Generate the audio file
-#         client.synthesize(
-#             text=llm_response,
-#             save_as=file_path,
-#             speed=1,  # Overrides default speed
-#             sample_rate=8000 
-#         )
-        
-#         # Return the relative path for serving the file
-#         relative_path = f"/static/audio/{filename}"
-#         print(f"Audio generated successfully: {relative_path}")
-#         return relative_path
-
-#     except Exception as e:
-#         print(f"Error generating audio: {str(e)}")
-#         raise
-
-# if __name__ == "__main__":
-#     import time
-#     start = time.time()
-#     try:
-#         output_path = text_to_speech("hello this is me")
-#         print(f"Generated audio file at: {output_path}")
-#     except Exception as e:
-#         print(f"Failed to generate audio: {str(e)}")
-
-#     end = time.time()
-
-#     print(end - start)
 
 
 

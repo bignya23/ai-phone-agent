@@ -4,6 +4,7 @@ import os
 import agent
 import src.speech_to_text as speech_to_text
 import src.text_to_speech
+import src.tools
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
@@ -11,6 +12,7 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 conversation_history = ""
 user_input = ""
 inputs = {}
+tools_response = ""
 
 @app.route("/get_info", methods=["POST"])
 def get_info():
@@ -34,9 +36,10 @@ def main_agent():
     global conversation_history
     global user_input
     global inputs
+    global tools_response
 
     # Generate response from agent
-    response = agent.sales_conversation(
+    response = agent.sales_conversation_with_tools(
         inputs["salesperson_name"],
         inputs["salesperson_role"],
         inputs["company_name"],
@@ -44,7 +47,8 @@ def main_agent():
         inputs["company_values"],
         inputs["conversation_purpose"],
         inputs["conversation_type"],
-        conversation_history
+        tools_response,
+        conversation_history,
     )
 
     clean_message = response
@@ -75,6 +79,7 @@ def upload_audio():
     global conversation_history
     global user_input
     global inputs
+    global tools_response
 
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
@@ -93,9 +98,17 @@ def upload_audio():
         return jsonify({"error": f"Failed to process audio: {str(e)}"}), 500
     
     conversation_history += f"User: {user_input}\n"
+    print(user_input)
+    tools_response_json = agent.conversation_tool(conversation_history)
+    print(f"Tools : {tools_response_json}\n")
+    tools_response = ""
+    if tools_response_json != "NO":
+        tools_response = src.tools.get_tools_response(tools_response_json)
+
+    print(f"Tools Response {tools_response}" )
     
     # Generate response from agent
-    response = agent.sales_conversation(
+    response = agent.sales_conversation_with_tools(
         inputs["salesperson_name"],
         inputs["salesperson_role"],
         inputs["company_name"],
@@ -103,6 +116,7 @@ def upload_audio():
         inputs["company_values"],
         inputs["conversation_purpose"],
         inputs["conversation_type"],
+        tools_response,
         conversation_history
     )
     print("Generating response")
