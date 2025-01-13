@@ -8,15 +8,15 @@ import json
 def knowledge_base(product_name: str):
     """Retrieve information related to a query."""
 
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+    # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
-    vector_store = FAISS.load_local("vector_store/knowledge_base", embeddings,allow_dangerous_deserialization=True)
+    # vector_store = FAISS.load_local("vector_store/knowledge_base", embeddings,allow_dangerous_deserialization=True)
 
-    retirivals = vector_store.similarity_search(product_name, k=2)
-    content = "\n".join(doc.page_content for doc in retirivals)
+    # retirivals = vector_store.similarity_search(product_name, k=2)
+    # content = "\n".join(doc.page_content for doc in retirivals)
 
-    return content
-    # return f"The {product_name} is available is our website, so visit website {company_name}.com for more details."
+    # return content
+    return f"The {product_name} is available is our website, so visit website {company_name}.com for more details."
 
 
 def payment_upi(amount):
