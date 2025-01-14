@@ -64,6 +64,22 @@ AI Phone Agent is an innovative application designed to handle cold calls for bu
 
 ---
 
+
+### `.env` File Format  
+
+Create a `.env` file in the project root and add the following environment variables:  
+
+```env
+# API key for Groq STT model and LLM Model
+GROQ_API_KEY=your__api_key_here
+
+# API key for TTS engine
+WAVES_API_KEY_1=tts_api_key_here
+
+```  
+
+Replace `your_api_key_here` with your actual API keys
+
 ## Usage  
 1. Start the backend and frontend as described above.  
 2. The agent initiates the call with a greeting.  
