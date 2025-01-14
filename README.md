@@ -1,5 +1,18 @@
 # AI Phone Agent  
 
+### Note:
+The Sales Agent Application is hosted on https://ai-phone-agent-1.onrender.com, with its backend service running at https://ai-phone-agent.onrender.com.
+
+Important Considerations:
+Free Instance Latency:
+Since the backend is hosted on a free instance, it may spin down due to inactivity. As a result, the first request after inactivity might experience a delay of 50 seconds or more while the instance restarts. Subsequent requests should process faster.
+
+Recommended Browsers:
+For optimal performance and compatibility, we recommend using the application on Google Chrome or Microsoft Edge.
+
+Using Tools:
+Enabling tools during the conversation may increase latency, as it requires additional processing time to fetch and integrate tool responses.
+
 AI Phone Agent is an innovative application designed to handle cold calls for businesses, hold meaningful conversations, and close sales. Powered by advanced speech-to-text (STT), large language models (LLMs), and text-to-speech (TTS) technology, the agent provides a seamless and natural experience for users.  
 
 ## Features  
