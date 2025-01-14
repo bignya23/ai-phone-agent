@@ -13,6 +13,9 @@ For optimal performance and compatibility, we recommend using the application on
 Using Tools:
 Enabling tools during the conversation may increase latency, as it requires additional processing time to fetch and integrate tool responses.
 
+To run the application locally, clone the repository and replace all occurrences of `https://ai-phone-agent.onrender.com` with `http://localhost:5000` in the `app_web.py` file. Similarly, in the frontend code, locate the file `Home.jsx` and replace `https://ai-phone-agent.onrender.com` with `http://localhost:5000`. Save the changes in both files. Start the backend by running `python app_web.py`, which will launch the Flask application on `http://localhost:5000`. Then, navigate to the frontend project directory and run `npm start` to launch the React frontend at `http://localhost:5173`.
+
+
 AI Phone Agent is an innovative application designed to handle cold calls for businesses, hold meaningful conversations, and close sales. Powered by advanced speech-to-text (STT), large language models (LLMs), and text-to-speech (TTS) technology, the agent provides a seamless and natural experience for users.  
 
 ## Features  
