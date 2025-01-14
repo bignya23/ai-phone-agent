@@ -7,7 +7,29 @@ import src.text_to_speech
 import src.tools
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "https://ai-phone-agent-1.onrender.com"}})
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "https://ai-phone-agent-1.onrender.com",  # Frontend domain
+            "http://localhost:5000",  # Local development
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Range", "X-Content-Range"],
+        "supports_credentials": True,
+        "max_age": 3600
+    }
+})
+
+
+# Add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://ai-phone-agent-1.onrender.com')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 conversation_history = ""
 user_input = ""
@@ -15,8 +37,12 @@ inputs = {}
 tools_response = ""
 
 
-@app.route("/get_info", methods=["POST"])
+@app.route("/get_info", methods=["POST", "OPTIONS"])
 def get_info():
+
+    if request.method == "OPTIONS":
+        return "", 200
+    
     data = request.get_json()
     global inputs
     
@@ -33,8 +59,13 @@ def get_info():
     
     return jsonify(inputs)
 
-@app.route("/agent", methods=["GET"])
+@app.route("/agent", methods=["GET", "OPTIONS"])
 def main_agent():
+
+    if request.method == "OPTIONS":
+        return "", 200
+
+    
     global conversation_history
     global user_input
     global inputs
@@ -76,8 +107,14 @@ def main_agent():
         "isEndOfCall": isendofcall
     })
 
-@app.route("/upload_audio", methods=["POST"])
+@app.route("/upload_audio", methods=["POST", "OPTIONS"])
 def upload_audio():
+
+
+    if request.method == "OPTIONS":
+        return "", 200
+
+    
     global conversation_history
     global user_input
     global inputs
