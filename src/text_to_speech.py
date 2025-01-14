@@ -2,7 +2,6 @@
 import time
 import os
 import requests
-import pyaudio
 import wave
 from io import BytesIO
 from dotenv import load_dotenv
@@ -41,35 +40,7 @@ def save_audio_from_response(response):
 
 
 def play_audio_from_response(response):
-    """
-    Play WAV audio directly from the API response.
-    """
-    if response.status_code == 200:
-        # Load audio content into a BytesIO stream
-        audio_stream = BytesIO(response.content)
-        # Read the WAV file from the stream
-        with wave.open(audio_stream, 'rb') as wf:
-            p = pyaudio.PyAudio()
-            # Open a PyAudio stream
-            stream = p.open(
-                format=p.get_format_from_width(wf.getsampwidth()),
-                channels=wf.getnchannels(),
-                rate=wf.getframerate(),
-                output=True
-            )
-            # Play the audio in chunks
-            chunk = 1024
-            data = wf.readframes(chunk)
-            while data:
-                stream.write(data)
-                data = wf.readframes(chunk)
-            # Close the stream
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
-            print("Audio played successfully.")
-    else:
-        print(f"Failed to generate TTS audio. Status code: {response.status_code}, Response: {response.text}")
+    pass
 
 
 
