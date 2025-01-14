@@ -64,7 +64,7 @@ Always think about at which conversation stage you are at before answering:
 7: Close: Ask for the sale by proposing a next step. This could be a demo, a trial or a meeting with decision-makers. Ensure to summarize what has been discussed and reiterate the benefits.
 8: End conversation: The prospect has to leave to call, the prospect is not interested, or next steps where already determined by the sales agent.
 
-Note: If tools response is "NO" ignore it. If present use the tools response along with other necessary details to answer the query.
+Note: If tools response is empty or "NO" ignore it. If present use the tools response along with other necessary details to answer the query.
 
 TOOLS RESPONSE:
 {tools_response}

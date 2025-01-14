@@ -1,114 +1,3 @@
-# from smallest import Smallest
-# import os
-# from dotenv import load_dotenv
-# import time
-# import uuid
-# load_dotenv()
-
-# client = Smallest(api_key=os.getenv("WAVES_API_KEY_1"))
-
-# def text_to_speech(llm_response):
-#     id = uuid.uuid4()
-#     os.makedirs("frontend/src/audio", exist_ok=True)
-#     full_path = os.path.join("frontend/src/audio" , f"{id}.wav")
-
-#     client.synthesize(
-#     llm_response,
-#     voice = "deepika",
-#     save_as=full_path,
-#     speed=1.3)
-
-#     return f"src/audio/{id}.wav"
-
-# if __name__ == "__main__":
-#     start = time.time()
-#     print(text_to_speech("What is the weather report in india"))
-#     end = time.time()
-#     print(end - start)
-
-
-
-# import asyncio
-# import os
-# import uuid
-# from dotenv import load_dotenv
-# from smallest import AsyncSmallest
-# import aiofiles
-# import time
-# load_dotenv()
-
-# client = AsyncSmallest(api_key=os.getenv("WAVES_API_KEY_1"))
-
-
-# async def text_to_speech(llm_response):
-#     id = uuid.uuid4()
-#     os.makedirs("frontend/src/audio", exist_ok=True)
-#     full_path = os.path.join("frontend/src/audio", f"{id}.wav")
-
-#     async with client as tts:
-#         audio_bytes = await tts.synthesize(llm_response,
-#             voice="deepika",
-#             save_as=full_path,
-#             speed=1.3,
-#         )
-        
-#         async with aiofiles.open(full_path, "wb") as f:
-#             await f.write(audio_bytes)
-
-#     return f"src/audio/{id}.wav"
-
-
-# if __name__ == "__main__":
-#     start = time.time()
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     audio_path = loop.run_until_complete(text_to_speech("what is the weather report in india"))
-#     loop.close()
-   
-#     end = time.time()
-#     print(end - start)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import time
 import os
@@ -206,7 +95,7 @@ def text_to_speech(input_response="What is the weather report in india"):
     response = requests.request("POST", url, json=payload, headers=headers)
     end_in = time.time()
     print(end_in - start_in)
-    # Play audio directly from the response
+
     return save_audio_from_response(response)
 
 if __name__ == "__main__":
@@ -219,7 +108,75 @@ if __name__ == "__main__":
 
 
 
+# from smallest import Smallest
+# import os
+# from dotenv import load_dotenv
+# import time
+# import uuid
+# load_dotenv()
 
+# client = Smallest(api_key=os.getenv("WAVES_API_KEY_1"))
+
+# def text_to_speech(llm_response):
+#     id = uuid.uuid4()
+#     os.makedirs("frontend/src/audio", exist_ok=True)
+#     full_path = os.path.join("frontend/src/audio" , f"{id}.wav")
+
+#     client.synthesize(
+#     llm_response,
+#     voice = "deepika",
+#     save_as=full_path,
+#     speed=1.3)
+
+#     return f"src/audio/{id}.wav"
+
+# if __name__ == "__main__":
+#     start = time.time()
+#     print(text_to_speech("What is the weather report in india"))
+#     end = time.time()
+#     print(end - start)
+
+
+
+# import asyncio
+# import os
+# import uuid
+# from dotenv import load_dotenv
+# from smallest import AsyncSmallest
+# import aiofiles
+# import time
+# load_dotenv()
+
+# client = AsyncSmallest(api_key=os.getenv("WAVES_API_KEY_1"))
+
+
+# async def text_to_speech(llm_response):
+#     id = uuid.uuid4()
+#     os.makedirs("frontend/src/audio", exist_ok=True)
+#     full_path = os.path.join("frontend/src/audio", f"{id}.wav")
+
+#     async with client as tts:
+#         audio_bytes = await tts.synthesize(llm_response,
+#             voice="deepika",
+#             save_as=full_path,
+#             speed=1.3,
+#         )
+        
+#         async with aiofiles.open(full_path, "wb") as f:
+#             await f.write(audio_bytes)
+
+#     return f"src/audio/{id}.wav"
+
+
+# if __name__ == "__main__":
+#     start = time.time()
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     audio_path = loop.run_until_complete(text_to_speech("what is the weather report in india"))
+#     loop.close()
+   
+#     end = time.time()
+#     print(end - start)
 
 
 

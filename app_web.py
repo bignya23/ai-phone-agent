@@ -109,7 +109,7 @@ def upload_audio():
             tools_response = src.tools.get_tools_response(tools_response_json)
 
         print(f"Tools Response {tools_response}" )
-    
+
     # Generate response from agent
     response = agent.sales_conversation_with_tools(
         inputs["salesperson_name"],

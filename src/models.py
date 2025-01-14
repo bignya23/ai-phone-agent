@@ -10,7 +10,7 @@ def get_llm():
     llm = ChatGroq(
         model_name="llama-3.3-70b-versatile",
         temperature=0.9,
-        api_key= os.getenv("GROQ_API_KEY_2"),
+        api_key= os.getenv("GROQ_API_KEY"),
         max_tokens=512
     )
 
