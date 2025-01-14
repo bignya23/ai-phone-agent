@@ -15,6 +15,7 @@ const HomePage = () => {
   const [conversationType, setConversationType] = useState("");
   const [withTools, setWithTools] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isCallEnded,setIsCallEnded] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Audio states
@@ -152,6 +153,9 @@ const handleSubmit = async (e) => {
         withCredentials: true, // Include credentials like cookies
       }
     );
+    if(response.data.isEndOfCall){
+      setIsCallEnded(true);
+    }
     setAudioUrl(response.data.audioUrl);
   } catch (error) {
     console.error("Error sending audio:", error);
