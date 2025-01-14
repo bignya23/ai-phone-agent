@@ -12,7 +12,7 @@ AI Phone Agent is an innovative application designed to handle cold calls for bu
    - Supports tool-based actions for enhanced functionality:  
      - **Knowledge Base**: Retrieve product price, specifications, or availability.  
        - **Arguments**: `[product_name: str]`  
-     - **Schedule Call**: Schedule a call using Google Calendar.  
+     - **Schedule Call**: Schedule a call 
        - **Arguments**: `[date: str, time: str]`  
      - **Payment UPI**: Generate a UPI payment request.  
        - **Arguments**: `[amount: float]`  

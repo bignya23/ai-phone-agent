@@ -13,6 +13,7 @@ const HomePage = () => {
   const [companyValues, setCompanyValues] = useState("");
   const [conversationPurpose, setConversationPurpose] = useState("");
   const [conversationType, setConversationType] = useState("");
+  const [withTools, setWithTools] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -57,6 +58,7 @@ const HomePage = () => {
           companyValues,
           conversationPurpose,
           conversationType,
+          withTools,
         },
         { withCredentials: true }
       );
@@ -71,7 +73,9 @@ const HomePage = () => {
   const startRecording = async () => {
     try {
       if (!streamRef.current) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
         streamRef.current = stream;
       }
 
@@ -87,7 +91,6 @@ const HomePage = () => {
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setIsMicActive(true);
-      
     } catch (error) {
       console.error("Error starting recording:", error);
       toast.error("Failed to start recording");
@@ -104,9 +107,9 @@ const HomePage = () => {
 
   const handleSendAudio = async () => {
     if (!isRecording) return;
-    
+
     stopRecording();
-    
+
     // Wait for the last chunk to be processed
     setTimeout(async () => {
       const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
@@ -153,7 +156,7 @@ const HomePage = () => {
         startRecording();
       };
 
-      audio.play().catch(error => {
+      audio.play().catch((error) => {
         console.error("Error playing audio:", error);
         toast.error("Failed to play audio");
       });
@@ -164,7 +167,7 @@ const HomePage = () => {
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
@@ -175,7 +178,7 @@ const HomePage = () => {
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
           <div className="flex justify-center">
-            <p className="text-2xl font-semibold">VoiceBuddy</p>
+            <p className="text-2xl font-semibold">CallMate</p>
           </div>
 
           {/* Form */}
@@ -338,6 +341,18 @@ const HomePage = () => {
               )}
             </div>
 
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text font-medium">With Tools</span>
+                <input
+                  type="checkbox"
+                  checked={withTools}
+                  onChange={(e) => setWithTools(e.target.checked)} // Toggle between true/false
+                  className="checkbox checkbox-primary ml-2"
+                />
+              </label>
+            </div>
+
             {/* Submit Button */}
             <button type="submit" className="btn btn-primary w-full">
               Submit
@@ -346,16 +361,20 @@ const HomePage = () => {
         </div>
       </div>
 
-
       {/* Right Side - Conversation Interface */}
       <div className="h-screen flex flex-col items-center justify-center">
         {!isSubmitted ? (
           <AuthImagePattern
-            title="Welcome to VoiceBuddy"
+            title="Welcome to CallMate"
             subtitle="Submit the form to start your conversation"
           />
         ) : (
           <div className="flex flex-col items-center justify-center space-y-6">
+            <audio autoPlay loop>
+              <source src="/bg.wav" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+
             <div className="flex gap-4 items-center">
               <Mic
                 onClick={startRecording}
