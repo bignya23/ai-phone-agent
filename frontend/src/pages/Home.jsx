@@ -49,7 +49,7 @@ const HomePage = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/get_info",
+        "https://ai-phone-agent.onrender.com/get_info",
         {
           salespersonName,
           salespersonRole,
@@ -123,7 +123,7 @@ const HomePage = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/upload_audio",
+        "https://ai-phone-agent.onrender.com/upload_audio",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -139,7 +139,7 @@ const HomePage = () => {
   const handleMicClick = async () => {
     try {
       setIsMicActive(true);
-      const response = await axios.get("http://127.0.0.1:5000/agent");
+      const response = await axios.get("https://ai-phone-agent.onrender.com/agent");
       setAudioUrl(response.data.audioUrl);
     } catch (error) {
       console.error("Error fetching initial audio:", error);
