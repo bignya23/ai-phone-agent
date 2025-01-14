@@ -38,38 +38,43 @@ const HomePage = () => {
     if (!conversationType.trim()) newErrors.conversationType = "Required";
     return newErrors;
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const newErrors = validateForm();
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        "https://ai-phone-agent.onrender.com/get_info",
-        {
-          salespersonName,
-          salespersonRole,
-          companyName,
-          companyBusiness,
-          companyValues,
-          conversationPurpose,
-          conversationType,
-          withTools,
+  try {
+    const response = await axios.post(
+      "https://ai-phone-agent.onrender.com/get_info",
+      {
+        salespersonName,
+        salespersonRole,
+        companyName,
+        companyBusiness,
+        companyValues,
+        conversationPurpose,
+        conversationType,
+        withTools,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
         },
-        { withCredentials: true }
-      );
-      setIsSubmitted(true);
-      toast.success("Form submitted successfully!");
-      handleMicClick();
-    } catch (error) {
-      toast.error("Failed to submit form. Please try again.");
-    }
-  };
-
+        withCredentials: true
+      }
+    );
+    
+    setIsSubmitted(true);
+    toast.success("Form submitted successfully!");
+    handleMicClick();
+  } catch (error) {
+    console.error('Submission error:', error);
+    toast.error("Failed to submit form. Please try again.");
+  }
+};
   const startRecording = async () => {
     try {
       if (!streamRef.current) {
