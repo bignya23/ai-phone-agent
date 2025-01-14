@@ -34,7 +34,7 @@ def save_audio_from_response(response):
                 # Write audio frames
                 output_file.writeframes(wf.readframes(wf.getnframes()))
         print(f"Audio saved successfully as {file_name}.")
-        return f"src/audio/{id}.wav"
+        return f"{id}.wav"
     else:
         print(f"Failed to generate TTS audio. Status code: {response.status_code}, Response: {response.text}")
 
