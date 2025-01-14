@@ -7,7 +7,7 @@ import src.text_to_speech
 import src.tools
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://ai-phone-agent-1.onrender.com"])
+CORS(app)
 
 conversation_history = ""
 user_input = ""
