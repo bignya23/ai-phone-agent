@@ -11,7 +11,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 import time
 from playsound import playsound
-from src.speech_to_text import audio_file, speech_to_text
+from src.speech_to_text import speech_to_text
 conversation_stage_id = 1
 
 def get_conversation_stage(conversation_history=""):
