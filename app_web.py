@@ -11,7 +11,7 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "https://ai-phone-agent-1.onrender.com",  # Frontend domain
-            "http://localhost:5000",  # Local development
+            "http://localhost:5173",  # Local development
         ],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
@@ -41,7 +41,7 @@ tools_response = ""
 def get_info():
 
     if request.method == "OPTIONS":
-        return "", 200
+        return "", 204
     
     data = request.get_json()
     global inputs
@@ -63,7 +63,7 @@ def get_info():
 def main_agent():
 
     if request.method == "OPTIONS":
-        return "", 200
+        return "", 204
 
     
     global conversation_history
@@ -112,7 +112,7 @@ def upload_audio():
 
 
     if request.method == "OPTIONS":
-        return "", 200
+        return "", 204
 
     
     global conversation_history
