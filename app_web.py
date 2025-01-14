@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import agent
@@ -110,7 +110,7 @@ def main_agent():
         audio_file_name = src.text_to_speech.text_to_speech(clean_message)
         audio_file_full_path = os.path.join(app.config["UPLOAD_FOLDER"], audio_file_name)
         print(audio_file_full_path)
-        audio_url = f"https://ai-phone-agent.onrender.com/{audio_file_name}"
+        audio_url = f"https://ai-phone-agent.onrender.com/audio/{audio_file_name}"
         print(audio_url)
     except Exception as e:
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
