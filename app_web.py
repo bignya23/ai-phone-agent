@@ -7,6 +7,12 @@ import src.text_to_speech
 import src.tools
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = "frontend/src/audio"  # Directory to save audio files
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 CORS(app, resources={
     r"/*": {
         "origins": [
@@ -59,6 +65,12 @@ def get_info():
     
     return jsonify(inputs)
 
+
+@app.route("/audio/<path:filename>")
+def serve_audio(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
 @app.route("/agent", methods=["GET", "OPTIONS"])
 def main_agent():
 
@@ -95,7 +107,11 @@ def main_agent():
 
     # Generate audio file
     try:
-        audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+        audio_file_name = src.text_to_speech.text_to_speech(clean_message)
+        audio_file_full_path = os.path.join(app.config["UPLOAD_FOLDER"], audio_file_name)
+        print(audio_file_full_path)
+        audio_url = f"https://ai-phone-agent.onrender.com/{audio_file_name}"
+        print(audio_url)
     except Exception as e:
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
     
@@ -103,7 +119,7 @@ def main_agent():
 
     return jsonify({
         "message": clean_message,
-        "audioUrl": audio_file_path,
+        "audioUrl": audio_url,
         "isEndOfCall": isendofcall
     })
 
@@ -172,7 +188,11 @@ def upload_audio():
 
     # Generate audio file
     try:
-        audio_file_path = src.text_to_speech.text_to_speech(clean_message)
+        audio_file_name = src.text_to_speech.text_to_speech(clean_message)
+        audio_file_full_path = os.path.join(app.config["UPLOAD_FOLDER"], audio_file_name)
+        print(audio_file_full_path)
+        audio_url = f"https://ai-phone-agent.onrender.com/audio/{audio_file_name}"
+        print(audio_url)
     except Exception as e:
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
     
@@ -183,7 +203,7 @@ def upload_audio():
 
     return jsonify({
         "message": clean_message,
-        "audioUrl": audio_file_path,
+        "audioUrl": audio_url,
         "isEndOfCall": isendofcall
     })
 
