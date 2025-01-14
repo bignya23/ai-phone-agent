@@ -14,6 +14,7 @@ user_input = ""
 inputs = {}
 tools_response = ""
 
+
 @app.route("/get_info", methods=["POST"])
 def get_info():
     data = request.get_json()
@@ -26,8 +27,8 @@ def get_info():
         "company_business": data.get("companyBusiness"),
         "company_values": data.get("companyValues"),
         "conversation_purpose": data.get("conversationPurpose"),
-        "conversation_type": data.get("conversation_type"),
-        "use_tools" : data.get("use_tools")
+        "conversation_type": data.get("conversationType"),
+        "use_tools" : data.get("withTools")
     }
     
     return jsonify(inputs)
@@ -101,7 +102,7 @@ def upload_audio():
     conversation_history += f"User: {user_input}\n"
     print(user_input)
     tools_response = ""
-    if inputs["use_tools"] == "true":
+    if inputs["use_tools"] == True:
         tools_response_json = agent.conversation_tool(conversation_history)
         print(f"Tools : {tools_response_json}\n")
         if tools_response_json != "NO":
