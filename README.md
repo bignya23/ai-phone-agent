@@ -24,7 +24,7 @@ AI Phone Agent is an innovative application designed to handle cold calls for bu
    - Leverages the Groq Llama 3.3 70B versatile model for response generation.  
    - Supports tool-based actions for enhanced functionality:  
      - **Knowledge Base**: Retrieve product price, specifications, or availability.  
-       - **Arguments**: `[product_name: str]`  
+       - **Arguments**: `[product_name: str]`  (can be used with vector stores)
      - **Schedule Call**: Schedule a call 
        - **Arguments**: `[date: str, time: str]`  
      - **Payment UPI**: Generate a UPI payment request.  
