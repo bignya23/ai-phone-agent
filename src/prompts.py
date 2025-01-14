@@ -39,7 +39,7 @@ Only generate one response at a time and act as {salesperson_name} only! When yo
 Conversation history: 
 {conversation_history}
 {salesperson_name}:"""
-
+  
 
 SALES_AGENT_INCEPTION_PROMPT_1 = """Never forget your name is {salesperson_name}. You work as a {salesperson_role}.
 You work at company named {company_name}. {company_name}'s business is the following: {company_business}.
