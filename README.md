@@ -57,6 +57,10 @@ AI Phone Agent is an innovative application designed to handle cold calls for bu
 2. Run the backend using:  
    ```bash
    python app_web.py
+   ```
+3. Optional(app.py is for twilio phone calling)
+   ```bash
+   python app.py
    ```  
 
 ---
@@ -84,10 +88,12 @@ Create a `.env` file in the project root and add the following environment varia
 
 ```env
 # API key for Groq STT model and LLM Model
-GROQ_API_KEY=your__api_key_here
+GROQ_API_KEY_2=your_api_key_here
 
 # API key for TTS engine
 WAVES_API_KEY_1=tts_api_key_here
+
+GEMINI_API_KEY="optional"
 
 ```  
 
