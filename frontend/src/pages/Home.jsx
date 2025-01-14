@@ -389,6 +389,7 @@ const handleSubmit = async (e) => {
         </div>
       </div>
 
+      
       {/* Right Side - Conversation Interface */}
       <div className="h-screen flex flex-col items-center justify-center">
         {!isSubmitted ? (
@@ -396,6 +397,11 @@ const handleSubmit = async (e) => {
             title="Welcome to CallMate"
             subtitle="Submit the form to start your conversation"
           />
+        ) : isCallEnded ? (
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-primary mb-4">Call Ended</h2>
+            <p className="text-gray-600">Thank you for using CallMate!</p>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center space-y-6">
             <audio autoPlay loop>
