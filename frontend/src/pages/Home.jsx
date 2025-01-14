@@ -117,24 +117,45 @@ const HomePage = () => {
     }, 100);
   };
 
-  const sendAudioToServer = async (audioBlob) => {
-    const formData = new FormData();
-    formData.append("audio", audioBlob, "user-audio.wav");
+  // const sendAudioToServer = async (audioBlob) => {
+  //   const formData = new FormData();
+  //   formData.append("audio", audioBlob, "user-audio.wav");
 
-    try {
-      const response = await axios.post(
-        "https://ai-phone-agent.onrender.com/upload_audio",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      setAudioUrl(response.data.audioUrl);
-    } catch (error) {
-      console.error("Error sending audio:", error);
-      toast.error("Failed to send audio");
-    }
-  };
+  //   try {
+  //     const response = await axios.post(
+  //       "https://ai-phone-agent.onrender.com/upload_audio",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+  //     setAudioUrl(response.data.audioUrl);
+  //   } catch (error) {
+  //     console.error("Error sending audio:", error);
+  //     toast.error("Failed to send audio");
+  //   }
+  // };
+
+  const sendAudioToServer = async (audioBlob) => {
+  const formData = new FormData();
+  formData.append("audio", audioBlob, "user-audio.wav");
+
+  try {
+    const response = await axios.post(
+      "https://ai-phone-agent.onrender.com/upload_audio",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true, // Include credentials like cookies
+      }
+    );
+    setAudioUrl(response.data.audioUrl);
+  } catch (error) {
+    console.error("Error sending audio:", error);
+    toast.error("Failed to send audio");
+  }
+};
+
 
   const handleMicClick = async () => {
     try {
