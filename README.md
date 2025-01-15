@@ -3,8 +3,8 @@
 ### Note:
 The Sales Agent Application is hosted on https://ai-phone-agent-1.onrender.com, with its backend service running at https://ai-phone-agent.onrender.com.
 
-Important Considerations:
-Free Instance Latency:
+### Important Considerations:
+### Free Instance Latency:
 Since the backend is hosted on a free instance, it may spin down due to inactivity. As a result, the first request after inactivity might experience a delay of 50 seconds or more while the instance restarts. Subsequent requests should process faster.
 
 Recommended Browsers:
