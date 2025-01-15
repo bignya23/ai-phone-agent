@@ -39,11 +39,14 @@ Tools are optionally integrated for enhanced context or real-time data lookup.
 
 A clean and natural language response is generated for the user.
 If the AI model outputs special tags (e.g., <END_OF_TURN> or <END_OF_CALL>), they are processed to determine the call flow.
-### Text-to-Speech (TTS): The response text is converted to an audio file using the text_to_speech module, enabling a natural and interactive conversation experience.
+### Text-to-Speech (TTS): 
+The response text is converted to an audio file using the text_to_speech module, enabling a natural and interactive conversation experience.
 
-### Conversation History: User inputs and agent responses are maintained in a conversation log, ensuring contextual consistency throughout the interaction.
+### Conversation History:
+User inputs and agent responses are maintained in a conversation log, ensuring contextual consistency throughout the interaction.
 
-### CORS Configuration: Proper Cross-Origin Resource Sharing (CORS) policies are implemented to enable secure communication between the frontend and backend across different domains.
+### CORS Configuration: 
+Proper Cross-Origin Resource Sharing (CORS) policies are implemented to enable secure communication between the frontend and backend across different domains.
 
 This architecture ensures a robust, scalable, and user-friendly AI sales agent capable of holding meaningful conversations, responding naturally, and providing an efficient solution for sales-driven interactions.
 ## Features  
