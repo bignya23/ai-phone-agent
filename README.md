@@ -7,10 +7,10 @@ The Sales Agent Application is hosted on https://ai-phone-agent-1.onrender.com, 
 ### Free Instance Latency:
 Since the backend is hosted on a free instance, it may spin down due to inactivity. As a result, the first request after inactivity might experience a delay of 50 seconds or more while the instance restarts. Subsequent requests should process faster.
 
-Recommended Browsers:
+**Recommended Browsers:**
 For optimal performance and compatibility, we recommend using the application on Google Chrome or Microsoft Edge.
 
-Using Tools:
+**Using Tools:**
 Enabling tools during the conversation may increase latency, as it requires additional processing time to fetch and integrate tool responses.
 
 ### To run the application locally:
@@ -25,25 +25,25 @@ The Sales Agent application is designed to facilitate seamless and intelligent s
 
 Frontend-Backend Interaction: The application consists of a React-based frontend and a Flask-based backend. The frontend collects user inputs (e.g., audio or text) and interacts with the backend via REST APIs to process data and fetch responses.
 
-Input Handling:
+### Input Handling:
 
 Audio Upload: The user speaks into the interface, and the audio file is sent to the backend via the /upload_audio endpoint.
 Text Input: The backend processes the user's speech or text and uses the context for response generation.
 Speech-to-Text (STT): Uploaded audio is converted to text using the speech_to_text module, extracting meaningful user queries or intents.
 
-AI-Driven Conversation:
+### AI-Driven Conversation:
 
 The backend uses a conversational AI model to generate responses based on inputs like salesperson details, company information, and conversation context.
 Tools are optionally integrated for enhanced context or real-time data lookup.
-Response Generation:
+### Response Generation:
 
 A clean and natural language response is generated for the user.
 If the AI model outputs special tags (e.g., <END_OF_TURN> or <END_OF_CALL>), they are processed to determine the call flow.
-Text-to-Speech (TTS): The response text is converted to an audio file using the text_to_speech module, enabling a natural and interactive conversation experience.
+### Text-to-Speech (TTS): The response text is converted to an audio file using the text_to_speech module, enabling a natural and interactive conversation experience.
 
-Conversation History: User inputs and agent responses are maintained in a conversation log, ensuring contextual consistency throughout the interaction.
+### Conversation History: User inputs and agent responses are maintained in a conversation log, ensuring contextual consistency throughout the interaction.
 
-CORS Configuration: Proper Cross-Origin Resource Sharing (CORS) policies are implemented to enable secure communication between the frontend and backend across different domains.
+### CORS Configuration: Proper Cross-Origin Resource Sharing (CORS) policies are implemented to enable secure communication between the frontend and backend across different domains.
 
 This architecture ensures a robust, scalable, and user-friendly AI sales agent capable of holding meaningful conversations, responding naturally, and providing an efficient solution for sales-driven interactions.
 ## Features  
